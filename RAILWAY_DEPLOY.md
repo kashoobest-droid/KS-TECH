@@ -21,18 +21,26 @@ Your Laravel project is **ready to deploy** on [Railway](https://railway.com). F
 
 ---
 
-## Step 2: Add a Database
+## Step 2: Add a Database (CRITICAL)
 
-Railway will create your app. You need a database:
+Railway runs your app and database in **separate containers**. The app cannot use `127.0.0.1`—you must add a database and connect it.
 
 1. In your project, click **+ New**
-2. Select **Database** → **Add MySQL** (or **PostgreSQL** if you prefer)
-3. Railway will provision the database and create a `DATABASE_URL` variable
+2. Select **Database** → **Add MySQL** (or **Add PostgreSQL**)
+3. Wait for the database to provision
 
-**If you use PostgreSQL** (Railway's default), add this to your project's **Variables**:
-- `DB_CONNECTION=pgsql`
+### Link the database to your app
 
-Laravel will read `DATABASE_URL` and configure the connection automatically.
+4. Click your **Laravel/web service** (not the database)
+5. Go to **Variables** tab
+6. Click **+ New Variable** → **Add Reference**
+7. Select your **MySQL** (or PostgreSQL) service
+8. Choose **`MYSQL_URL`** (or `DATABASE_URL` for PostgreSQL)
+9. Name the variable **`DATABASE_URL`** and save
+
+Laravel will read `DATABASE_URL` and configure the connection. Without this, the app uses `127.0.0.1` (localhost) and will fail with "Connection refused".
+
+**If you use PostgreSQL:** set `DB_CONNECTION=pgsql` and reference `DATABASE_URL` from the Postgres service.
 
 ---
 
@@ -47,8 +55,14 @@ In your **Laravel service** → **Variables** tab, add:
 | `APP_DEBUG` | `false` | ✅ Yes |
 | `APP_URL` | Your Railway URL, e.g. `https://your-app.up.railway.app` | ✅ Yes |
 | `DB_CONNECTION` | `mysql` or `pgsql` (match your database) | ✅ Yes |
+| `DATABASE_URL` | Reference from MySQL/Postgres service (see Step 2) | ✅ Yes |
 
-**Note:** Railway injects `DATABASE_URL` when you add a MySQL/PostgreSQL service. If it doesn't, you can set `DB_HOST`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` manually.
+**If `DATABASE_URL` doesn't work via reference**, set these manually from your MySQL service’s Variables:
+- `DB_HOST` (e.g. `monorail.proxy.rlwy.net`)
+- `DB_PORT` (usually `3306`)
+- `DB_DATABASE`
+- `DB_USERNAME`
+- `DB_PASSWORD`
 
 Other optional variables (keep defaults if unsure):
 - `CACHE_DRIVER=file`
@@ -121,9 +135,10 @@ These files were updated for deployment:
 
 | Issue | Solution |
 |-------|----------|
+| **"Connection refused" / Host: 127.0.0.1** | You have no database linked. Add MySQL (Step 2), then **Add Reference** → MySQL service → `MYSQL_URL` as `DATABASE_URL` on your web service. Redeploy. |
 | Build fails on `composer install` | Ensure `APP_KEY` is set before first deploy |
 | 500 error after deploy | Check logs in Railway dashboard; often `APP_KEY` or database config |
-| Database connection failed | Verify `DATABASE_URL` or `DB_*` variables; check DB is running |
+| Database connection failed | Verify `DATABASE_URL` or `DB_*` variables; check DB is running; ensure the reference is on the **web** service, not the DB service |
 | Uploads disappear on redeploy | Add a Volume (see Option A above) or use S3 |
 | Mixed content (HTTP/HTTPS) | Set `APP_URL` to `https://your-app.up.railway.app` |
 
