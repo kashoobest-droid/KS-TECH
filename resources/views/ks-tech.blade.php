@@ -368,6 +368,7 @@
             position: relative;
             flex-shrink: 0;
             width: 72px;
+            min-width: 72px;
             height: 72px;
             border-radius: 10px;
             overflow: hidden;
@@ -375,9 +376,11 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
         .offer-card-modern__img {
+            display: block;
             width: 100%;
             height: 100%;
             object-fit: cover;
+            object-position: center;
         }
         .offer-card-modern__badge {
             position: absolute;

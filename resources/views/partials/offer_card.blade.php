@@ -11,6 +11,8 @@
                 alt="{{ $offer->gift_name }}"
                 class="offer-card-modern__img"
                 loading="lazy"
+                width="72"
+                height="72"
             />
             <span class="offer-card-modern__badge">Free gift</span>
         </div>

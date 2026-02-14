@@ -44,11 +44,19 @@ class products extends Model
         }
         $offer = $this->offer;
         $now = now();
-        if ($offer->starts_at !== null && $now->lessThan(\Carbon\Carbon::parse($offer->starts_at))) {
-            return false;
+        // Start: hide only if we're before the start-of-day of starts_at
+        if ($offer->starts_at !== null) {
+            $start = \Carbon\Carbon::parse($offer->starts_at)->startOfDay();
+            if ($now->lessThan($start)) {
+                return false;
+            }
         }
-        if ($offer->ends_at !== null && $now->greaterThan(\Carbon\Carbon::parse($offer->ends_at))) {
-            return false;
+        // End: hide only if we're after the end-of-day of ends_at (so "Feb 20" = valid all day Feb 20)
+        if ($offer->ends_at !== null) {
+            $end = \Carbon\Carbon::parse($offer->ends_at)->endOfDay();
+            if ($now->greaterThan($end)) {
+                return false;
+            }
         }
         return true;
     }

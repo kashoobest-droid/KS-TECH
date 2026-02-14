@@ -14,8 +14,8 @@
         .product-detail-img { max-height: 400px; object-fit: contain; }
         .offer-card-modern { margin-top: 12px; border-radius: 12px; overflow: hidden; background: linear-gradient(135deg, #fff8f0 0%, #fff0e6 50%, #ffe8d9 100%); border: 1px solid rgba(255, 153, 0, 0.25); box-shadow: 0 2px 12px rgba(255, 153, 0, 0.08); }
         .offer-card-modern__inner { display: flex; gap: 14px; align-items: center; padding: 14px 16px; }
-        .offer-card-modern__media { position: relative; flex-shrink: 0; width: 88px; height: 88px; border-radius: 10px; overflow: hidden; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-        .offer-card-modern__img { width: 100%; height: 100%; object-fit: cover; }
+        .offer-card-modern__media { position: relative; flex-shrink: 0; width: 88px; min-width: 88px; height: 88px; border-radius: 10px; overflow: hidden; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .offer-card-modern__img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }
         .offer-card-modern__badge { position: absolute; bottom: 0; left: 0; right: 0; text-align: center; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; background: rgba(255, 153, 0, 0.95); color: #fff; padding: 3px 4px; }
         .offer-card-modern__body { flex: 1; min-width: 0; }
         .offer-card-modern__label { display: inline-block; font-size: 0.75rem; font-weight: 600; color: #c2410c; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
