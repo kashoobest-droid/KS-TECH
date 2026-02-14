@@ -23,7 +23,7 @@ class OfferController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'product_id' => 'nullable|exists:products,id',
+            'product_id' => 'required|exists:products,id',
             'offer_name' => 'nullable|string|max:255',
             'gift_name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -52,7 +52,7 @@ class OfferController extends Controller
     public function update(Request $request, Offer $offer)
     {
         $data = $request->validate([
-            'product_id' => 'nullable|exists:products,id',
+            'product_id' => 'required|exists:products,id',
             'offer_name' => 'nullable|string|max:255',
             'gift_name' => 'required|string|max:255',
             'description' => 'nullable|string',

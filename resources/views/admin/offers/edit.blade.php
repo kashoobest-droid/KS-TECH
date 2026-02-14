@@ -22,13 +22,14 @@
         @csrf
         @method('PUT')
         <div class="mb-3">
-            <label class="form-label">Product (optional)</label>
-            <select name="product_id" class="form-select">
-                <option value="">-- None --</option>
+            <label class="form-label">Product <span class="text-danger">*</span></label>
+            <select name="product_id" class="form-select" required>
+                <option value="">-- Select a product (offer will show on this product's card) --</option>
                 @foreach($products as $p)
                     <option value="{{ $p->id }}" {{ old('product_id', $offer->product_id) == $p->id ? 'selected' : '' }}>{{ $p->name }}</option>
                 @endforeach
             </select>
+            <div class="form-text">The offer appears on the home page and product page only for this product.</div>
         </div>
         <div class="mb-3">
             <label class="form-label">Offer Name</label>

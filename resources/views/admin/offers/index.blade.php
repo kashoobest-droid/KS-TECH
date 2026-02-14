@@ -18,6 +18,12 @@
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
+    @if($offers->contains(fn($o) => !$o->product_id))
+        <div class="alert alert-warning mb-3">
+            <strong>Not showing on the store?</strong> Offers only appear on the product they're linked to. Edit any offer with "Product: -" below and select a product so it shows on the home page.
+        </div>
+    @endif
+
     <div class="card">
         <div class="card-body p-0">
             <table class="table mb-0">
@@ -37,7 +43,13 @@
                         <td>{{ $o->id }}</td>
                         <td>{{ $o->offer_name ?? '-' }}</td>
                         <td>{{ $o->gift_name }}</td>
-                        <td>{{ optional($o->product)->name ?? '-' }}</td>
+                        <td>
+                            @if($o->product_id)
+                                {{ $o->product->name }}
+                            @else
+                                <span class="text-danger" title="Select a product in Edit so this offer shows on the store">— None (won't show on store)</span>
+                            @endif
+                        </td>
                         <td>{{ optional($o->ends_at)->format('Y-m-d H:i') ?? '-' }}</td>
                         <td class="text-end">
                             <a href="{{ route('offer.edit', $o) }}" class="btn btn-sm btn-outline-primary">Edit</a>
