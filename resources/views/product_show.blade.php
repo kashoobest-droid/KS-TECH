@@ -77,7 +77,7 @@
                         @endif
                     </p>
                     <h3 class="text-warning mb-4">${{ number_format($product->price, 2) }}</h3>
-                    @if($product->offer && (is_null($product->offer->starts_at) || \Carbon\Carbon::now()->greaterThanOrEqualTo($product->offer->starts_at)) && (is_null($product->offer->ends_at) || \Carbon\Carbon::now()->lessThanOrEqualTo($product->offer->ends_at)))
+                    @if($product->hasVisibleOffer())
                         @include('partials.offer_card', ['offer' => $product->offer])
                     @endif
                     @auth

@@ -623,7 +623,7 @@
                                     ${{ number_format($product->price, 2) }}
                                 </div>
 
-                                @if($product->offer && (is_null($product->offer->starts_at) || \Carbon\Carbon::now()->greaterThanOrEqualTo($product->offer->starts_at)) && (is_null($product->offer->ends_at) || \Carbon\Carbon::now()->lessThanOrEqualTo($product->offer->ends_at)))
+                                @if($product->hasVisibleOffer())
                                     @include('partials.offer_card', ['offer' => $product->offer])
                                 @endif
 
