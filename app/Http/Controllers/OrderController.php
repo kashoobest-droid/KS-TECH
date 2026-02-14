@@ -56,7 +56,8 @@ class OrderController extends Controller
         $shippingAddress = $user->formatShippingAddress();
         $phone = $user->phone;
 
-        DB::transaction(function () use ($user, $cartItems, $shippingAddress, $phone, $request) {
+        $order = null;
+        DB::transaction(function () use ($user, $cartItems, $shippingAddress, $phone, $request, &$order) {
             $total = 0;
             $order = Order::create([
                 'user_id' => $user->id,
@@ -86,14 +87,13 @@ class OrderController extends Controller
             $order->update(['total' => $total]);
 
             $user->cartItems()->delete();
-
-            try {
-                Mail::to($user->email)->send(new OrderConfirmed($order->fresh(['items'])));
-            } catch (\Exception $e) {
-                // Log but don't fail the order
-                report($e);
-            }
         });
+
+        try {
+            Mail::to($user->email)->queue(new OrderConfirmed($order->fresh(['items'])));
+        } catch (\Exception $e) {
+            report($e);
+        }
 
         return redirect()->route('orders.index')->with('success', 'Order placed successfully! Confirmation email sent.');
     }

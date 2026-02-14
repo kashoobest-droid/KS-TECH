@@ -68,6 +68,7 @@ Other optional variables (keep defaults if unsure):
 - `CACHE_DRIVER=file`
 - `SESSION_DRIVER=file`
 - `FILESYSTEM_DISK=local`
+- `QUEUE_CONNECTION=database` — **Recommended** for order confirmation emails (prevents 30s timeout when placing orders)
 
 ---
 
@@ -106,7 +107,36 @@ For production, consider storing uploads on S3, Cloudflare R2, or similar. This 
 
 ---
 
-## Step 6: Create an Admin User
+## Step 6: Queue Worker (Required for Order Emails)
+
+Order confirmation emails are queued to avoid timeouts. You **must** run a queue worker for emails to be sent.
+
+### Option A: Add a Worker Service (Recommended)
+
+1. In your Railway project, click **+ New** → **Empty Service**
+2. Connect it to the same GitHub repo as your web app
+3. Set the **Root Directory** (if any) to match your web service
+4. Go to **Settings** → **Deploy**
+5. Set **Custom Start Command** to: `php artisan queue:work --sleep=3 --tries=3`
+6. Add the same **Variables** as your web service (especially `DATABASE_URL`, `APP_KEY`, `MAIL_*`)
+7. Deploy the worker
+
+### Option B: Single Service with Process Manager
+
+If you prefer one service, use a `Procfile` at the project root:
+
+```
+web: php -S 0.0.0.0:$PORT -t public
+worker: php artisan queue:work --sleep=3 --tries=3
+```
+
+Then configure Railway to run both (check Railway docs for multi-process support).
+
+**Important:** Set `QUEUE_CONNECTION=database` on both web and worker services.
+
+---
+
+## Step 7: Create an Admin User
 
 After the first deploy:
 
@@ -131,6 +161,16 @@ These files were updated for deployment:
 
 ---
 
+## Step 8: Run Migrations (include jobs table)
+
+Ensure the `jobs` table exists for the queue:
+
+```bash
+php artisan migrate --force
+```
+
+---
+
 ## Troubleshooting
 
 | Issue | Solution |
@@ -141,6 +181,8 @@ These files were updated for deployment:
 | Database connection failed | Verify `DATABASE_URL` or `DB_*` variables; check DB is running; ensure the reference is on the **web** service, not the DB service |
 | Uploads disappear on redeploy | Add a Volume (see Option A above) or use S3 |
 | Mixed content (HTTP/HTTPS) | Set `APP_URL` to `https://your-app.up.railway.app` |
+| **Place Order times out (30s)** | Set `QUEUE_CONNECTION=database` and add a queue worker service (see Step 6) |
+| Order emails not received | Ensure queue worker is running; check `jobs` table has migrations run |
 
 ---
 
