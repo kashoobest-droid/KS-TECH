@@ -12,6 +12,18 @@
         .navbar-custom { background-color: #1a1a1a; }
         .navbar-custom .navbar-brand, .navbar-custom .nav-link { color: #ff9900 !important; }
         .product-detail-img { max-height: 400px; object-fit: contain; }
+        .offer-card-modern { margin-top: 12px; border-radius: 12px; overflow: hidden; background: linear-gradient(135deg, #fff8f0 0%, #fff0e6 50%, #ffe8d9 100%); border: 1px solid rgba(255, 153, 0, 0.25); box-shadow: 0 2px 12px rgba(255, 153, 0, 0.08); }
+        .offer-card-modern__inner { display: flex; gap: 14px; align-items: center; padding: 14px 16px; }
+        .offer-card-modern__media { position: relative; flex-shrink: 0; width: 88px; height: 88px; border-radius: 10px; overflow: hidden; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .offer-card-modern__img { width: 100%; height: 100%; object-fit: cover; }
+        .offer-card-modern__badge { position: absolute; bottom: 0; left: 0; right: 0; text-align: center; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; background: rgba(255, 153, 0, 0.95); color: #fff; padding: 3px 4px; }
+        .offer-card-modern__body { flex: 1; min-width: 0; }
+        .offer-card-modern__label { display: inline-block; font-size: 0.75rem; font-weight: 600; color: #c2410c; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .offer-card-modern__title { font-size: 1.05rem; font-weight: 700; color: #1a1a1a; margin: 0 0 6px 0; line-height: 1.25; }
+        .offer-card-modern__desc { font-size: 0.85rem; color: #666; margin: 0 0 8px 0; line-height: 1.35; }
+        .offer-card-modern__countdown { font-size: 0.8rem; color: #555; }
+        .offer-card-modern__countdown-value { font-weight: 700; color: #c2410c; font-variant-numeric: tabular-nums; }
+        .offer-card-modern__meta { font-size: 0.8rem; color: #666; }
     </style>
 </head>
 <body>
@@ -65,6 +77,9 @@
                         @endif
                     </p>
                     <h3 class="text-warning mb-4">${{ number_format($product->price, 2) }}</h3>
+                    @if($product->offer && (is_null($product->offer->starts_at) || \Carbon\Carbon::now()->greaterThanOrEqualTo($product->offer->starts_at)) && (is_null($product->offer->ends_at) || \Carbon\Carbon::now()->lessThanOrEqualTo($product->offer->ends_at)))
+                        @include('partials.offer_card', ['offer' => $product->offer])
+                    @endif
                     @auth
                         <div class="d-flex gap-2">
                             @if($product->quantity < 1)
@@ -87,5 +102,20 @@
             </div>
         </div>
     </div>
+    <script>
+        (function(){
+            document.querySelectorAll('.offer-card-modern__countdown-value[data-ends-at]').forEach(function(el){
+                var end = new Date(el.getAttribute('data-ends-at')).getTime();
+                function upd(){
+                    var now = Date.now();
+                    if(end <= now){ el.textContent = 'Expired'; return; }
+                    var d = Math.floor((end - now) / 86400000), h = Math.floor(((end - now) % 86400000) / 3600000), m = Math.floor(((end - now) % 3600000) / 60000), s = Math.floor(((end - now) % 60000) / 1000);
+                    el.textContent = (d > 0 ? d + 'd ' : '') + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+                }
+                upd();
+                if(!el._offerTimer) el._offerTimer = setInterval(upd, 1000);
+            });
+        })();
+    </script>
 </body>
 </html>

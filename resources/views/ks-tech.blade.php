@@ -349,6 +349,85 @@
             margin-right: 12px !important;
         }
 
+        /* Offer card - modern */
+        .offer-card-modern {
+            margin-top: 12px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #fff8f0 0%, #fff0e6 50%, #ffe8d9 100%);
+            border: 1px solid rgba(255, 153, 0, 0.25);
+            box-shadow: 0 2px 12px rgba(255, 153, 0, 0.08);
+        }
+        .offer-card-modern__inner {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            padding: 12px 14px;
+        }
+        .offer-card-modern__media {
+            position: relative;
+            flex-shrink: 0;
+            width: 72px;
+            height: 72px;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .offer-card-modern__img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .offer-card-modern__badge {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(255, 153, 0, 0.95);
+            color: #fff;
+            padding: 2px 4px;
+        }
+        .offer-card-modern__body { flex: 1; min-width: 0; }
+        .offer-card-modern__label {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #c2410c;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+        .offer-card-modern__title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin: 0 0 4px 0;
+            line-height: 1.25;
+        }
+        .offer-card-modern__desc {
+            font-size: 0.8rem;
+            color: #666;
+            margin: 0 0 6px 0;
+            line-height: 1.35;
+        }
+        .offer-card-modern__countdown {
+            font-size: 0.75rem;
+            color: #555;
+        }
+        .offer-card-modern__countdown-label { margin-right: 4px; }
+        .offer-card-modern__countdown-value {
+            font-weight: 700;
+            color: #c2410c;
+            font-variant-numeric: tabular-nums;
+        }
+        .offer-card-modern__meta { font-size: 0.75rem; color: #666; }
+
         /* Responsive */
         @media (max-width: 768px) {
             .hero-section h1 {
@@ -544,6 +623,10 @@
                                     ${{ number_format($product->price, 2) }}
                                 </div>
 
+                                @if($product->offer && (is_null($product->offer->starts_at) || \Carbon\Carbon::now()->greaterThanOrEqualTo($product->offer->starts_at)) && (is_null($product->offer->ends_at) || \Carbon\Carbon::now()->lessThanOrEqualTo($product->offer->ends_at)))
+                                    @include('partials.offer_card', ['offer' => $product->offer])
+                                @endif
+
                                 <!-- Action Buttons -->
                                 <div class="product-actions">
                                     @auth
@@ -636,7 +719,26 @@
     </footer>
 
     <script>
-        // Cart and Favorites use form submissions - no JS needed
+        (function(){
+            function runOfferCountdowns(){
+                document.querySelectorAll('.offer-card-modern__countdown-value[data-ends-at]').forEach(function(el){
+                    var end = new Date(el.getAttribute('data-ends-at')).getTime();
+                    function upd(){
+                        var now = Date.now();
+                        if(end <= now){ el.textContent = 'Expired'; return; }
+                        var d = Math.floor((end - now) / 86400000);
+                        var h = Math.floor(((end - now) % 86400000) / 3600000);
+                        var m = Math.floor(((end - now) % 3600000) / 60000);
+                        var s = Math.floor(((end - now) % 60000) / 1000);
+                        el.textContent = (d > 0 ? d + 'd ' : '') + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+                    }
+                    upd();
+                    if(!el._offerTimer) el._offerTimer = setInterval(upd, 1000);
+                });
+            }
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', runOfferCountdowns);
+            else runOfferCountdowns();
+        })();
     </script>
 </body>
 </html>

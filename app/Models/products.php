@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\category;
+use App\Models\Offer;
 use App\Models\ProductImage;
 
 class products extends Model
@@ -28,6 +29,11 @@ class products extends Model
     public function images()
     {
         return $this->hasMany(ProductImage::class, 'product_id');
+    }
+
+    public function offer()
+    {
+        return $this->hasOne(Offer::class, 'product_id');
     }
 
     public function cartItems()

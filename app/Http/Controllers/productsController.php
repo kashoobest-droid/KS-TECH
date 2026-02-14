@@ -16,7 +16,7 @@ class productsController extends Controller
      */
     public function index()
     {
-        $products = products::all();
+        $products = products::with('images', 'category', 'offer')->get();
         return view("product_index", compact('products'));
     }
 
@@ -81,7 +81,7 @@ class productsController extends Controller
      */
     public function show(products $product)
     {
-        $product->load('images', 'category');
+        $product->load('images', 'category', 'offer');
         return view('product_show', compact('product'));
     }
 
@@ -190,7 +190,7 @@ class productsController extends Controller
             $qb->where('Category_id', $categoryId);
         }
 
-        $products = $qb->with('images', 'category')->paginate(12)->withQueryString();
+        $products = $qb->with('images', 'category', 'offer')->paginate(12)->withQueryString();
 
         $cartProductIds = Auth::check() ? Auth::user()->cartItems()->pluck('product_id')->flip()->toArray() : [];
         $favoriteProductIds = Auth::check() ? Auth::user()->favorites()->pluck('product_id')->flip()->toArray() : [];

@@ -89,6 +89,7 @@ class OrderController extends Controller
             $user->cartItems()->delete();
         });
 
+        // Use queue() so the request returns quickly. Do NOT use send() — it blocks and can cause 502 on Railway (request timeout).
         try {
             Mail::to($user->email)->queue(new OrderConfirmed($order->fresh(['items'])));
         } catch (\Exception $e) {

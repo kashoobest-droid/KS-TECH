@@ -182,6 +182,7 @@ php artisan migrate --force
 | Uploads disappear on redeploy | Add a Volume (see Option A above) or use S3 |
 | Mixed content (HTTP/HTTPS) | Set `APP_URL` to `https://your-app.up.railway.app` |
 | **Place Order times out (30s)** | Set `QUEUE_CONNECTION=database` and add a queue worker service (see Step 6) |
+| **502 Bad Gateway** after placing order | Do not use `Mail::send()` for order emails — use `Mail::queue()` only. Ensure `QUEUE_CONNECTION=database` and a queue worker is running so the web request returns quickly. |
 | Order emails not received | Ensure queue worker is running; check `jobs` table has migrations run |
 
 ---

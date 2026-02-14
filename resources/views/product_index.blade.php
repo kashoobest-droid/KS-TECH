@@ -98,6 +98,9 @@
                                 <p class="card-text">{{ $product->description }}</p>
                                 <p class="card-text"><strong>Price:</strong> ${{ number_format($product->price, 2) }}</p>
                                 <p class="card-text"><strong>Category:</strong> {{ optional($product->category)->name ?? 'Unrecognized' }}</p>
+                                @if($product->offer && (is_null($product->offer->ends_at) || \Carbon\Carbon::now()->lessThanOrEqualTo($product->offer->ends_at)))
+                                    @include('partials.offer_card', ['offer' => $product->offer])
+                                @endif
                             </div>
                             <div class="card-footer bg-white border-0 d-flex justify-content-between">
                                 <a href="{{ route('product.edit', $product->id) }}" class="btn btn-sm btn-warning">Edit</a>

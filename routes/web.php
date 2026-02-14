@@ -14,6 +14,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\OfferController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -61,6 +62,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     });
     Route::resource('category', categoryController::class);
     Route::resource('product', productsController::class);
+    Route::resource('offer', OfferController::class);
     Route::resource('users', UserController::class)->except(['create', 'store', 'show']);
 });
 
