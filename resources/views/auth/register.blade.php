@@ -184,7 +184,8 @@
 
                 <div class="form-group">
                     <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" required placeholder="At least 6 characters">
+                    <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" required placeholder="Min 8 chars, letters, numbers, mixed case">
+                    <small class="text-muted" style="font-size:0.8rem;">At least 8 characters, with letters (upper & lower) and numbers</small>
                     @error('password')
                         <div class="error-message">{{ $message }}</div>
                     @enderror

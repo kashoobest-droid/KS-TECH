@@ -190,7 +190,7 @@ class productsController extends Controller
             $qb->where('Category_id', $categoryId);
         }
 
-        $products = $qb->get();
+        $products = $qb->with('images', 'category')->paginate(12)->withQueryString();
 
         $cartProductIds = Auth::check() ? Auth::user()->cartItems()->pluck('product_id')->flip()->toArray() : [];
         $favoriteProductIds = Auth::check() ? Auth::user()->favorites()->pluck('product_id')->flip()->toArray() : [];

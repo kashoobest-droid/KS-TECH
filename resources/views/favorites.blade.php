@@ -73,10 +73,14 @@
                                 </div>
                             </a>
                             <div class="p-3 pt-0 d-flex gap-2">
+                                @if($fav->product->quantity < 1)
+                                    <button type="button" class="btn btn-secondary btn-sm w-100" disabled>Out of Stock</button>
+                                @else
                                 <form action="{{ route('cart.add', $fav->product) }}" method="POST" class="flex-grow-1">
                                     @csrf
                                     <button type="submit" class="btn btn-add-cart w-100 btn-sm"><i class="fas fa-cart-plus"></i> Add to Cart</button>
                                 </form>
+                                @endif
                                 <form action="{{ route('favorites.remove', $fav->product) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')

@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rules\Password as PasswordRule;
 
 class RegisterController extends Controller
 {
@@ -20,7 +21,11 @@ class RegisterController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
+            'password' => [
+                'required',
+                'confirmed',
+                PasswordRule::min(8)->letters()->numbers()->mixedCase(),
+            ],
         ]);
 
         $user = User::create([

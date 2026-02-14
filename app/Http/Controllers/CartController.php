@@ -18,8 +18,13 @@ class CartController extends Controller
 
     public function add(products $product, Request $request)
     {
+        $available = $product->quantity ?? 0;
+        if ($available < 1) {
+            return back()->with('error', 'This product is out of stock.');
+        }
+
         $quantity = $request->input('quantity', 1);
-        $quantity = max(1, min((int) $quantity, $product->quantity ?? 999));
+        $quantity = max(1, min((int) $quantity, $available));
 
         $item = CartItem::firstOrNew([
             'user_id' => Auth::id(),

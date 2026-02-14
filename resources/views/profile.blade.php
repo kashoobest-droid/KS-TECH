@@ -298,6 +298,30 @@
                         <a href="/" class="btn btn-secondary">Cancel</a>
                     </div>
                 </form>
+
+                <hr class="my-4">
+
+                <h5 class="mb-3">Change Password</h5>
+                <form action="{{ route('profile.password.update') }}" method="POST" class="mt-3">
+                    @csrf
+                    @method('PUT')
+                    <div class="mb-3">
+                        <label class="form-label">Current Password</label>
+                        <input type="password" name="current_password" class="form-control @error('current_password') is-invalid @enderror" required autocomplete="current-password">
+                        @error('current_password')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">New Password</label>
+                        <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" required autocomplete="new-password">
+                        <small class="text-muted">Min 8 characters, with letters (upper & lower) and numbers</small>
+                        @error('password')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Confirm New Password</label>
+                        <input type="password" name="password_confirmation" class="form-control" required autocomplete="new-password">
+                    </div>
+                    <button type="submit" class="btn btn-save">Update Password</button>
+                </form>
             </div>
         </div>
     </div>

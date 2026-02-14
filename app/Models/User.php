@@ -61,4 +61,22 @@ class User extends Authenticatable
     {
         return $this->hasMany(Favorite::class);
     }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function formatShippingAddress(): string
+    {
+        $parts = array_filter([
+            $this->street_name,
+            $this->building_name,
+            $this->floor_apartment,
+            $this->landmark,
+            $this->city_area,
+            $this->country,
+        ]);
+        return implode(', ', $parts) ?: 'No address on file';
+    }
 }

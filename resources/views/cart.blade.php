@@ -45,6 +45,9 @@
         @if(session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
+        @if(session('error'))
+            <div class="alert alert-danger">{{ session('error') }}</div>
+        @endif
 
         @if($cartItems->isEmpty())
             <div class="cart-card p-5 text-center">
@@ -97,7 +100,7 @@
                         @php $subtotal = $cartItems->sum(fn($i) => $i->product->price * $i->quantity); @endphp
                         <p class="d-flex justify-content-between mb-2"><span>Subtotal ({{ $cartItems->sum('quantity') }} items)</span><span class="cart-total">${{ number_format($subtotal, 2) }}</span></p>
                         <hr>
-                        <p class="text-muted small">Checkout coming soon!</p>
+                        <a href="{{ route('checkout') }}" class="btn btn-warning w-100 mb-2"><i class="fas fa-lock"></i> Proceed to Checkout</a>
                         <a href="/" class="btn btn-outline-secondary w-100"><i class="fas fa-arrow-left"></i> Continue Shopping</a>
                     </div>
                 </div>

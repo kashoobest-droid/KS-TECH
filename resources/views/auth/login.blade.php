@@ -176,6 +176,12 @@
                     @error('password')
                         <div class="error-message">{{ $message }}</div>
                     @enderror
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <label class="small mb-0">
+                            <input type="checkbox" name="remember"> Remember me
+                        </label>
+                        <a href="{{ route('password.request') }}" class="small" style="color: #ff9900;">Forgot password?</a>
+                    </div>
                 </div>
 
                 <button type="submit" class="btn btn-login">Sign In</button>

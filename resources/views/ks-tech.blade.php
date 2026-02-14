@@ -418,8 +418,11 @@
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                 <li><a class="dropdown-item" href="{{ route('profile.edit') }}"><i class="fas fa-user"></i> Profile</a></li>
+                                <li><a class="dropdown-item" href="{{ route('orders.index') }}"><i class="fas fa-box"></i> My Orders</a></li>
                                 @if(Auth::user()->is_admin)
                                     <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('admin.orders.index') }}"><i class="fas fa-box"></i> Manage Orders</a></li>
                                     <li><a class="dropdown-item" href="{{ route('product.index') }}"><i class="fas fa-boxes"></i> Manage Products</a></li>
                                     <li><a class="dropdown-item" href="{{ route('category.index') }}"><i class="fas fa-list"></i> Manage Categories</a></li>
                                     <li><a class="dropdown-item" href="{{ route('users.index') }}"><i class="fas fa-users-cog"></i> Manage Users</a></li>
@@ -461,6 +464,12 @@
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ session('error') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         @endif
@@ -516,8 +525,8 @@
                                 @else
                                     <img src="https://via.placeholder.com/300x250?text=No+Image" class="w-100 h-100" alt="No Image">
                                 @endif
-                                <div class="product-badge">
-                                    In Stock
+                                <div class="product-badge {{ $product->quantity < 1 ? 'bg-danger' : '' }}">
+                                    {{ $product->quantity < 1 ? 'Out of Stock' : 'In Stock' }}
                                 </div>
                             </div>
 
@@ -538,6 +547,11 @@
                                 <!-- Action Buttons -->
                                 <div class="product-actions">
                                     @auth
+                                        @if($product->quantity < 1)
+                                            <button type="button" class="btn-add-cart w-100" disabled style="opacity: 0.6; cursor: not-allowed;">
+                                                <i class="fas fa-times-circle"></i> Out of Stock
+                                            </button>
+                                        @else
                                         <form action="{{ route('cart.add', $product) }}" method="POST" class="flex-grow-1">
                                             @csrf
                                             <button type="submit" class="btn-add-cart w-100 {{ isset($cartProductIds[$product->id]) ? 'btn-in-cart' : '' }}">
@@ -548,6 +562,7 @@
                                                 @endif
                                             </button>
                                         </form>
+                                        @endif
                                         <form action="{{ route('favorites.toggle', $product) }}" method="POST" class="favorite-form">
                                             @csrf
                                             <button type="submit" class="btn-wishlist {{ isset($favoriteProductIds[$product->id]) ? 'active' : '' }}" title="{{ isset($favoriteProductIds[$product->id]) ? 'Remove from Favorites' : 'Add to Favorites' }}">
@@ -569,6 +584,12 @@
                 @endforeach
             @endif
         </div>
+
+        @if($products->hasPages())
+            <div class="d-flex justify-content-center mt-4">
+                {{ $products->links() }}
+            </div>
+        @endif
     </div>
 
     <!-- Footer -->

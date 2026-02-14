@@ -57,14 +57,24 @@
                     <span class="badge bg-secondary">{{ optional($product->category)->name ?? 'Uncategorized' }}</span>
                     <h2 class="mt-2">{{ $product->name }}</h2>
                     <p class="text-muted">{{ $product->description }}</p>
-                    <p class="mb-2"><strong>Stock:</strong> {{ $product->quantity }}</p>
+                    <p class="mb-2"><strong>Stock:</strong>
+                        @if($product->quantity < 1)
+                            <span class="text-danger">Out of stock</span>
+                        @else
+                            {{ $product->quantity }}
+                        @endif
+                    </p>
                     <h3 class="text-warning mb-4">${{ number_format($product->price, 2) }}</h3>
                     @auth
                         <div class="d-flex gap-2">
+                            @if($product->quantity < 1)
+                                <button type="button" class="btn btn-secondary btn-lg" disabled><i class="fas fa-times-circle"></i> Out of Stock</button>
+                            @else
                             <form action="{{ route('cart.add', $product) }}" method="POST">
                                 @csrf
                                 <button type="submit" class="btn btn-warning btn-lg"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
                             </form>
+                            @endif
                             <form action="{{ route('favorites.toggle', $product) }}" method="POST">
                                 @csrf
                                 <button type="submit" class="btn btn-outline-danger btn-lg"><i class="far fa-heart"></i> Add to Favorites</button>
