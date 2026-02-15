@@ -69,10 +69,20 @@
                 <div class="checkout-card p-4">
                     <h5 class="mb-3">Order Summary</h5>
                     <p class="d-flex justify-content-between mb-2"><span>Subtotal</span><span class="fw-bold text-warning">${{ number_format($subtotal, 2) }}</span></p>
+                    @if(isset($coupon) && $coupon && $discount > 0)
+                        <p class="d-flex justify-content-between mb-2 text-success"><span>Discount ({{ $coupon->code }})</span><span>-${{ number_format($discount, 2) }}</span></p>
+                    @endif
+                    <p class="d-flex justify-content-between mb-2"><span>Total</span><span class="fw-bold fs-5 text-warning">${{ number_format($total ?? $subtotal, 2) }}</span></p>
                     <hr>
-                    <p class="small text-muted">Payment will be collected on delivery (Cash on Delivery). You can add online payment later.</p>
-                    <form action="{{ route('orders.store') }}" method="POST">
+                    <form action="{{ route('orders.store') }}" method="POST" id="checkoutForm">
                         @csrf
+                        <div class="mb-3">
+                            <label class="form-label small">Coupon code (optional)</label>
+                            <div class="input-group input-group-sm">
+                                <input type="text" name="coupon_code" class="form-control" placeholder="Enter code" value="{{ optional($coupon)->code ?? old('coupon_code') }}">
+                            </div>
+                            <p class="small text-muted mb-0">Enter your code and place order to apply.</p>
+                        </div>
                         <div class="mb-3">
                             <label class="form-label small">Order notes (optional)</label>
                             <textarea name="notes" class="form-control form-control-sm" rows="2" placeholder="Special instructions..."></textarea>

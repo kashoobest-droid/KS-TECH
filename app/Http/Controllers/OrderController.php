@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\OrderConfirmed;
+use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Mail;
 
 class OrderController extends Controller
 {
-    public function checkout()
+    public function checkout(Request $request)
     {
         $user = Auth::user();
         $cartItems = $user->cartItems()->with('product.images', 'product.category')->get();
@@ -29,8 +30,18 @@ class OrderController extends Controller
         }
 
         $subtotal = $cartItems->sum(fn ($i) => $i->product->price * $i->quantity);
+        $coupon = null;
+        $discount = 0.0;
+        $total = $subtotal;
+        if ($request->filled('coupon_code')) {
+            $coupon = Coupon::where('code', strtoupper(trim($request->coupon_code)))->first();
+            if ($coupon && $coupon->isValid($subtotal)) {
+                $discount = $coupon->discountFor($subtotal);
+                $total = max(0, $subtotal - $discount);
+            }
+        }
 
-        return view('checkout', compact('cartItems', 'subtotal'));
+        return view('checkout', compact('cartItems', 'subtotal', 'coupon', 'discount', 'total'));
     }
 
     public function store(Request $request)
@@ -44,6 +55,7 @@ class OrderController extends Controller
 
         $request->validate([
             'notes' => 'nullable|string|max:500',
+            'coupon_code' => 'nullable|string|max:50',
         ]);
 
         // Validate stock again
@@ -55,22 +67,34 @@ class OrderController extends Controller
 
         $shippingAddress = $user->formatShippingAddress();
         $phone = $user->phone;
+        $subtotal = $cartItems->sum(fn ($i) => $i->product->price * $i->quantity);
+        $coupon = null;
+        $discount = 0.0;
+        if ($request->filled('coupon_code')) {
+            $coupon = Coupon::where('code', strtoupper(trim($request->coupon_code)))->first();
+            if ($coupon && $coupon->isValid($subtotal)) {
+                $discount = $coupon->discountFor($subtotal);
+            }
+        }
+        $total = max(0, $subtotal - $discount);
 
         $order = null;
-        DB::transaction(function () use ($user, $cartItems, $shippingAddress, $phone, $request, &$order) {
-            $total = 0;
+        DB::transaction(function () use ($user, $cartItems, $shippingAddress, $phone, $request, $coupon, $discount, $total, &$order) {
+            $orderSubtotal = 0;
             $order = Order::create([
                 'user_id' => $user->id,
                 'status' => 'pending',
-                'total' => 0,
+                'total' => $total,
                 'shipping_address' => $shippingAddress,
                 'phone' => $phone,
                 'notes' => $request->notes,
+                'coupon_id' => $coupon?->id,
+                'discount' => $discount,
             ]);
 
             foreach ($cartItems as $item) {
-                $subtotal = $item->product->price * $item->quantity;
-                $total += $subtotal;
+                $itemSubtotal = $item->product->price * $item->quantity;
+                $orderSubtotal += $itemSubtotal;
 
                 OrderItem::create([
                     'order_id' => $order->id,
@@ -78,13 +102,15 @@ class OrderController extends Controller
                     'product_name' => $item->product->name,
                     'price' => $item->product->price,
                     'quantity' => $item->quantity,
-                    'subtotal' => $subtotal,
+                    'subtotal' => $itemSubtotal,
                 ]);
 
                 $item->product->decrement('quantity', $item->quantity);
             }
 
-            $order->update(['total' => $total]);
+            if ($coupon) {
+                $coupon->increment('used_count');
+            }
 
             $user->cartItems()->delete();
         });

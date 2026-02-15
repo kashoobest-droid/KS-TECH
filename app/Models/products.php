@@ -70,4 +70,32 @@ class products extends Model
     {
         return $this->hasMany(Favorite::class, 'product_id');
     }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'product_id');
+    }
+
+    public function stockNotifications()
+    {
+        return $this->hasMany(StockNotification::class, 'product_id');
+    }
+
+    public function averageRating(): float
+    {
+        return (float) $this->reviews()->avg('rating');
+    }
+
+    /**
+     * Check if a specific user has purchased this product
+     * @param User $user
+     * @return bool
+     */
+    public function hasPurchasedBy(User $user): bool
+    {
+        return OrderItem::whereHas('order', function($query) use ($user) {
+            $query->where('user_id', $user->id)
+                  ->where('status', '!=', 'cancelled');
+        })->where('product_id', $this->id)->exists();
+    }
 }

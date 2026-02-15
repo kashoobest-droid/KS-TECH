@@ -16,10 +16,13 @@ class Order extends Model
         'shipping_address',
         'phone',
         'notes',
+        'coupon_id',
+        'discount',
     ];
 
     protected $casts = [
         'total' => 'decimal:2',
+        'discount' => 'decimal:2',
     ];
 
     public function user()
@@ -30,6 +33,11 @@ class Order extends Model
     public function items()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function coupon()
+    {
+        return $this->belongsTo(Coupon::class);
     }
 
     public function getStatusBadgeClassAttribute(): string

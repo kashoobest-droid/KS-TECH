@@ -507,6 +507,7 @@
                                     <li><a class="dropdown-item" href="{{ route('admin.orders.index') }}"><i class="fas fa-box"></i> Manage Orders</a></li>
                                     <li><a class="dropdown-item" href="{{ route('product.index') }}"><i class="fas fa-boxes"></i> Manage Products</a></li>
                                     <li><a class="dropdown-item" href="{{ route('category.index') }}"><i class="fas fa-list"></i> Manage Categories</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('admin.coupons.index') }}"><i class="fas fa-tag"></i> Coupons</a></li>
                                     <li><a class="dropdown-item" href="{{ route('users.index') }}"><i class="fas fa-users-cog"></i> Manage Users</a></li>
                                 @endif
                                 <li><hr class="dropdown-divider"></li>
@@ -543,6 +544,12 @@
 
     <!-- Main Content -->
     <div class="container my-5">
+        @include('partials.breadcrumbs', [
+            'items' => array_filter([
+                ['label' => 'Home', 'url' => url('/')],
+                isset($categoryForBreadcrumb) ? ['label' => $categoryForBreadcrumb->name, 'url' => url('/?category=' . $categoryForBreadcrumb->id)] : null,
+            ])
+        ])
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ session('success') }}
@@ -555,18 +562,31 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         @endif
-        <!-- Category Filter -->
+        <!-- Category Filter & Sort -->
         <div class="category-section">
-            <div class="d-flex justify-content-center flex-wrap">
-                <a href="{{ url('/') }}" class="category-btn {{ request()->has('category') ? '' : 'active' }}">
+            <div class="d-flex justify-content-center flex-wrap align-items-center gap-2">
+                <a href="{{ url('/') }}" class="category-btn {{ !request()->has('category') ? 'active' : '' }}">
                     <i class="fas fa-cube"></i> All Products
                 </a>
-
                 @foreach($categories as $category)
                     <a href="{{ url('/?category=' . $category->id) }}" class="category-btn {{ request('category') == $category->id ? 'active' : '' }}">
                         {{ $category->name }}
                     </a>
                 @endforeach
+                <div class="ms-lg-3 mt-2 mt-lg-0">
+                    <form action="{{ url('/') }}" method="GET" class="d-inline" id="sortForm">
+                        @if(request('q'))<input type="hidden" name="q" value="{{ request('q') }}">@endif
+                        @if(request('category'))<input type="hidden" name="category" value="{{ request('category') }}">@endif
+                        <label class="small text-muted me-1">Sort:</label>
+                        <select name="sort" class="form-select form-select-sm d-inline-block w-auto" onchange="this.form.submit()">
+                            <option value="newest" {{ ($sort ?? '') === 'newest' ? 'selected' : '' }}>Newest</option>
+                            <option value="price_asc" {{ ($sort ?? '') === 'price_asc' ? 'selected' : '' }}>Price: Low to High</option>
+                            <option value="price_desc" {{ ($sort ?? '') === 'price_desc' ? 'selected' : '' }}>Price: High to Low</option>
+                            <option value="name_asc" {{ ($sort ?? '') === 'name_asc' ? 'selected' : '' }}>Name: A–Z</option>
+                            <option value="name_desc" {{ ($sort ?? '') === 'name_desc' ? 'selected' : '' }}>Name: Z–A</option>
+                        </select>
+                    </form>
+                </div>
             </div>
         </div>
 
@@ -585,32 +605,34 @@
                     <div class="col-lg-3 col-md-4 col-sm-6 mb-4 product-item" data-category="{{ $product->Category_id }}">
                         <div class="product-card">
                             <!-- Product Image -->
-                            <div class="product-image-container position-relative">
-                                @if($product->images->count())
-                                    <div id="carouselProduct{{ $product->id }}" class="carousel slide h-100" data-bs-ride="carousel">
-                                        <div class="carousel-inner h-100">
-                                            @foreach($product->images as $img)
-                                                <div class="carousel-item @if($loop->first) active @endif h-100">
-                                                    <img src="{{ filter_var($img->image_path, FILTER_VALIDATE_URL) ? $img->image_path : asset($img->image_path) }}" class="d-block w-100" alt="{{ $product->name }}">
-                                                </div>
-                                            @endforeach
+                            <a href="{{ route('product.show', $product) }}" class="text-decoration-none" style="display: block;">
+                                <div class="product-image-container position-relative">
+                                    @if($product->images->count())
+                                        <div id="carouselProduct{{ $product->id }}" class="carousel slide h-100" data-bs-ride="carousel">
+                                            <div class="carousel-inner h-100">
+                                                @foreach($product->images as $img)
+                                                    <div class="carousel-item @if($loop->first) active @endif h-100">
+                                                        <img src="{{ filter_var($img->image_path, FILTER_VALIDATE_URL) ? $img->image_path : asset($img->image_path) }}" class="d-block w-100" alt="{{ $product->name }}">
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                            @if($product->images->count() > 1)
+                                                <button class="carousel-control-prev" type="button" data-bs-target="#carouselProduct{{ $product->id }}" data-bs-slide="prev" onclick="event.stopPropagation();">
+                                                    <span class="carousel-control-prev-icon"></span>
+                                                </button>
+                                                <button class="carousel-control-next" type="button" data-bs-target="#carouselProduct{{ $product->id }}" data-bs-slide="next" onclick="event.stopPropagation();">
+                                                    <span class="carousel-control-next-icon"></span>
+                                                </button>
+                                            @endif
                                         </div>
-                                        @if($product->images->count() > 1)
-                                            <button class="carousel-control-prev" type="button" data-bs-target="#carouselProduct{{ $product->id }}" data-bs-slide="prev">
-                                                <span class="carousel-control-prev-icon"></span>
-                                            </button>
-                                            <button class="carousel-control-next" type="button" data-bs-target="#carouselProduct{{ $product->id }}" data-bs-slide="next">
-                                                <span class="carousel-control-next-icon"></span>
-                                            </button>
-                                        @endif
+                                    @else
+                                        <img src="https://via.placeholder.com/300x250?text=No+Image" class="w-100 h-100" alt="No Image">
+                                    @endif
+                                    <div class="product-badge {{ $product->quantity < 1 ? 'bg-danger' : '' }}">
+                                        {{ $product->quantity < 1 ? 'Out of Stock' : 'In Stock' }}
                                     </div>
-                                @else
-                                    <img src="https://via.placeholder.com/300x250?text=No+Image" class="w-100 h-100" alt="No Image">
-                                @endif
-                                <div class="product-badge {{ $product->quantity < 1 ? 'bg-danger' : '' }}">
-                                    {{ $product->quantity < 1 ? 'Out of Stock' : 'In Stock' }}
                                 </div>
-                            </div>
+                            </a>
 
                             <!-- Product Info -->
                             <div class="product-body">
@@ -620,6 +642,9 @@
 
                                 <div class="product-info">
                                     <i class="fas fa-box"></i> Stock: <strong>{{ $product->quantity }}</strong>
+                                    @if($product->quantity > 0 && $product->quantity < 5)
+                                        <span class="text-danger small ms-1">(Only {{ $product->quantity }} left!)</span>
+                                    @endif
                                 </div>
 
                                 <div class="product-price">
@@ -634,9 +659,9 @@
                                 <div class="product-actions">
                                     @auth
                                         @if($product->quantity < 1)
-                                            <button type="button" class="btn-add-cart w-100" disabled style="opacity: 0.6; cursor: not-allowed;">
-                                                <i class="fas fa-times-circle"></i> Out of Stock
-                                            </button>
+                                            <a href="{{ route('product.show', $product) }}#notify-me" class="btn-add-cart w-100 text-decoration-none text-center d-flex align-items-center justify-content-center" style="background: #28a745;">
+                                                <i class="fas fa-bell"></i> Notify me when in stock
+                                            </a>
                                         @else
                                         <form action="{{ route('cart.add', $product) }}" method="POST" class="flex-grow-1">
                                             @csrf
@@ -656,9 +681,15 @@
                                             </button>
                                         </form>
                                     @else
-                                        <a href="{{ route('login') }}?redirect={{ urlencode(request()->fullUrl()) }}" class="btn-add-cart text-decoration-none text-center d-flex align-items-center justify-content-center" style="flex: 1;">
-                                            <i class="fas fa-sign-in-alt"></i> Sign in to Add to Cart
-                                        </a>
+                                        @if($product->quantity < 1)
+                                            <a href="{{ route('product.show', $product) }}#notify-me" class="btn-add-cart text-decoration-none text-center d-flex align-items-center justify-content-center" style="flex: 1; background: #28a745;">
+                                                <i class="fas fa-bell"></i> Notify me when in stock
+                                            </a>
+                                        @else
+                                            <a href="{{ route('login') }}?redirect={{ urlencode(request()->fullUrl()) }}" class="btn-add-cart text-decoration-none text-center d-flex align-items-center justify-content-center" style="flex: 1;">
+                                                <i class="fas fa-sign-in-alt"></i> Sign in to Add to Cart
+                                            </a>
+                                        @endif
                                         <a href="{{ route('login') }}?redirect={{ urlencode(request()->fullUrl()) }}" class="btn-wishlist" title="Sign in to add to favorites">
                                             <i class="far fa-heart"></i>
                                         </a>
@@ -690,19 +721,23 @@
                     <h6>Quick Links</h6>
                     <ul style="list-style: none; padding: 0;">
                         <li><a href="/">Home</a></li>
-                        <li><a href="/">Products</a></li>
-                        <li><a href="/">Categories</a></li>
-                        <li><a href="/">Contact Us</a></li>
+                        <li><a href="{{ route('contact') }}">Contact Us</a></li>
+                        <li><a href="{{ route('faq') }}">FAQ</a></li>
+                        <li><a href="{{ route('order.track.show') }}">Track Order</a></li>
                     </ul>
                 </div>
                 <div class="col-md-3 mb-4">
-                    <h6>Customer Service</h6>
-                    <ul style="list-style: none; padding: 0;">
-                        <li><a href="/">Track Order</a></li>
-                        <li><a href="/">Returns</a></li>
-                        <li><a href="/">Shipping Info</a></li>
-                        <li><a href="/">FAQ</a></li>
-                    </ul>
+                    <h6>Newsletter</h6>
+                    @if(session('newsletter_success'))
+                        <p class="small text-success">{{ session('newsletter_success') }}</p>
+                    @else
+                    <form action="{{ route('newsletter.subscribe') }}" method="POST" class="d-flex gap-1">
+                        @csrf
+                        <input type="email" name="email" class="form-control form-control-sm" placeholder="Your email" required>
+                        <button type="submit" class="btn btn-warning btn-sm">Subscribe</button>
+                    </form>
+                    <p class="small text-muted mt-1 mb-0">New arrivals, exclusive offers &amp; discount codes. Unsubscribe anytime.</p>
+                    @endif
                 </div>
                 <div class="col-md-3 mb-4">
                     <h6>Follow Us</h6>

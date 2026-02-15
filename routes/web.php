@@ -15,6 +15,12 @@ use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OfferController;
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\OrderTrackingController;
+use App\Http\Controllers\NewsletterController;
+use App\Http\Controllers\StockNotificationController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\CouponController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -40,6 +46,14 @@ Route::get('welcome', function () {
 
 Route::get('ping', [teststoreController::class,'test']);
 
+// Public pages
+Route::get('/contact', [ContactController::class, 'show'])->name('contact');
+Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit');
+Route::get('/faq', fn () => view('faq'))->name('faq');
+Route::get('/track-order', [OrderTrackingController::class, 'show'])->name('order.track.show');
+Route::post('/track-order', [OrderTrackingController::class, 'track'])->name('order.track');
+Route::post('/newsletter', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
+
 // Auth Routes
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
@@ -64,6 +78,10 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::resource('product', productsController::class);
     Route::resource('offer', OfferController::class);
     Route::resource('users', UserController::class)->except(['create', 'store', 'show']);
+    Route::get('admin/coupons', [CouponController::class, 'index'])->name('admin.coupons.index');
+    Route::get('admin/coupons/create', [CouponController::class, 'create'])->name('admin.coupons.create');
+    Route::post('admin/coupons', [CouponController::class, 'store'])->name('admin.coupons.store');
+    Route::delete('admin/coupons/{coupon}', [CouponController::class, 'destroy'])->name('admin.coupons.destroy');
 });
 
 // Profile routes
@@ -86,10 +104,19 @@ Route::middleware('auth')->group(function () {
 
     // Favorites routes
     Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
-    Route::post('/favorites/add/{product}', [FavoriteController::class, 'add'])->name('favorites.add');
-    Route::delete('/favorites/remove/{product}', [FavoriteController::class, 'remove'])->name('favorites.remove');
-    Route::post('/favorites/toggle/{product}', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
+    Route::post('/favorites/add/{product}', [FavoriteController::class, 'add'])->middleware('auth')->name('favorites.add');
+    Route::delete('/favorites/remove/{product}', [FavoriteController::class, 'remove'])->middleware('auth')->name('favorites.remove');
+    Route::post('/favorites/toggle/{product}', [FavoriteController::class, 'toggle'])->middleware('auth')->name('favorites.toggle');
 });
+
+// Stock notification (guest or auth)
+Route::post('/product/{product}/notify-stock', [StockNotificationController::class, 'store'])->name('stock-notify.store');
+
+// Review (auth only)
+Route::post('/product/{product}/review', [ReviewController::class, 'store'])->name('review.store')->middleware('auth');
+Route::put('/review/{review}', [ReviewController::class, 'update'])->name('review.update')->middleware('auth');
+Route::delete('/review/{review}', [ReviewController::class, 'destroy'])->name('review.destroy')->middleware('auth');
+Route::post('/review/{review}/react', [ReviewController::class, 'react'])->name('review.react')->middleware('auth');
 
 // Public product view only
 Route::get('/product/{product}', [productsController::class, 'show'])->name('product.show');

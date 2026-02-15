@@ -47,16 +47,18 @@ class FavoriteController extends Controller
 
         if ($fav) {
             $fav->delete();
+            $message = 'Removed from favorites!';
             $added = false;
         } else {
             Favorite::create(['user_id' => Auth::id(), 'product_id' => $product->id]);
+            $message = 'Added to favorites!';
             $added = true;
         }
 
         if (request()->expectsJson()) {
-            return response()->json(['success' => true, 'added' => $added]);
+            return response()->json(['success' => true, 'added' => $added, 'message' => $message]);
         }
 
-        return back();
+        return back()->with('success', $message);
     }
 }

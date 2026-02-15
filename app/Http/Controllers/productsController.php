@@ -81,8 +81,13 @@ class productsController extends Controller
      */
     public function show(products $product)
     {
-        $product->load('images', 'category', 'offer');
-        return view('product_show', compact('product'));
+        $product->load('images', 'category', 'offer', 'reviews.user');
+        $relatedProducts = products::where('Category_id', $product->Category_id)
+            ->where('id', '!=', $product->id)
+            ->with('images', 'category', 'offer')
+            ->limit(4)
+            ->get();
+        return view('product_show', compact('product', 'relatedProducts'));
     }
 
     /**
@@ -112,6 +117,7 @@ class productsController extends Controller
             $validatedData['Category_id'] = $validatedData['category_id'];
             unset($validatedData['category_id']);
         }
+        $wasOutOfStock = $product->quantity < 1;
         $product->update($validatedData);
 
         // Remove selected images
@@ -149,6 +155,10 @@ class productsController extends Controller
             return back()->withErrors(['images' => 'At least one image is required.']);
         }
 
+        if ($wasOutOfStock && $product->fresh()->quantity > 0) {
+            \App\Jobs\NotifyStockBackJob::dispatch($product->fresh());
+        }
+
         return redirect()->route('product.index')->with('success', 'Product updated successfully!');
     }
 
@@ -172,6 +182,7 @@ class productsController extends Controller
     {
         $q = $request->query('q');
         $categoryId = $request->query('category');
+        $sort = $request->query('sort', 'newest');
         $categories = category::all();
 
         $qb = products::query();
@@ -190,6 +201,14 @@ class productsController extends Controller
             $qb->where('Category_id', $categoryId);
         }
 
+        match ($sort) {
+            'price_asc' => $qb->orderBy('price'),
+            'price_desc' => $qb->orderByDesc('price'),
+            'name_asc' => $qb->orderBy('name'),
+            'name_desc' => $qb->orderByDesc('name'),
+            default => $qb->orderByDesc('id'),
+        };
+
         $products = $qb->with('images', 'category', 'offer')->paginate(12)->withQueryString();
 
         $cartProductIds = Auth::check() ? Auth::user()->cartItems()->pluck('product_id')->flip()->toArray() : [];
@@ -197,6 +216,8 @@ class productsController extends Controller
         $cartQuantities = Auth::check() ? Auth::user()->cartItems()->pluck('quantity', 'product_id')->toArray() : [];
         $cartCount = Auth::check() ? Auth::user()->cartItems()->sum('quantity') : 0;
 
-        return view('ks-tech', compact('products', 'categories', 'q', 'categoryId', 'cartProductIds', 'favoriteProductIds', 'cartQuantities', 'cartCount'));
+        $categoryForBreadcrumb = $categoryId ? category::find($categoryId) : null;
+
+        return view('ks-tech', compact('products', 'categories', 'q', 'categoryId', 'categoryForBreadcrumb', 'sort', 'cartProductIds', 'favoriteProductIds', 'cartQuantities', 'cartCount'));
     }
 }
