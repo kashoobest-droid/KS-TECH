@@ -1,46 +1,85 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <title>Cart - KS Tech Store</title>
+    <title>{{ __('messages.nav_cart') }} - KS Tech Store</title>
     <style>
-        body { background-color: #f5f5f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto; }
+        /* Light Mode (Default) */
+        body { background-color: #ffffff; color: #333333; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto; }
+        .cart-card { background: #ffffff; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); overflow: hidden; border: 1px solid #e0e0e0; }
+        .border-bottom { border-color: #e0e0e0 !important; }
+        h2, h4, h5, h6 { color: #333333; }
+        .text-muted { color: #666666 !important; }
+        .form-control { background-color: #ffffff; border-color: #ddd; color: #333333; }
+        .form-control:focus { background-color: #ffffff; border-color: #ff9900; color: #333333; box-shadow: 0 0 0 0.2rem rgba(255, 153, 0, 0.25); }
+        .btn-outline-secondary { color: #666666; border-color: #ddd; }
+        .btn-outline-secondary:hover { background-color: #f5f5f5; border-color: #999; color: #333333; }
+        .alert { background-color: #ffffff; border-color: #ddd; color: #333333; }
+        .alert-success { background-color: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .alert-danger { background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        .btn-remove { color: #dc3545; }
+        .btn-remove:hover { color: #c82333; }
+        
+        /* Dark Mode */
+        html.dark-mode body { background-color: #0f0f0f; color: #e0e0e0; }
+        html.dark-mode .cart-card { background: #1a1a1a; border: 1px solid #2a2a2a; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        html.dark-mode .border-bottom { border-color: #2a2a2a !important; }
+        html.dark-mode h2, html.dark-mode h4, html.dark-mode h5, html.dark-mode h6 { color: #ffffff; }
+        html.dark-mode .text-muted { color: #b0b0b0 !important; }
+        html.dark-mode .form-control { background-color: #2a2a2a; border-color: #3a3a3a; color: #e0e0e0; }
+        html.dark-mode .form-control:focus { background-color: #2a2a2a; border-color: #ff9900; color: #e0e0e0; }
+        html.dark-mode .btn-outline-secondary { color: #b0b0b0; border-color: #3a3a3a; }
+        html.dark-mode .btn-outline-secondary:hover { background-color: #3a3a3a; border-color: #4a4a4a; color: #ffffff; }
+        html.dark-mode .alert { background-color: #1a1a1a; border-color: #2a2a2a; color: #e0e0e0; }
+        html.dark-mode .alert-success { background-color: #1a2a1a; border-color: #2a5a2a; color: #90ee90; }
+        html.dark-mode .alert-danger { background-color: #2a1a1a; border-color: #5a2a2a; color: #ff9999; }
+        html.dark-mode .btn-remove { color: #ff6b6b; }
+        html.dark-mode .btn-remove:hover { color: #ff5252; }
+        
         .navbar-custom { background-color: #1a1a1a; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .navbar-custom .navbar-brand { color: #ff9900 !important; font-size: 1.8rem; font-weight: bold; }
         .navbar-custom .nav-link { color: #ffffff !important; margin: 0 10px; transition: color 0.3s; }
         .navbar-custom .nav-link:hover { color: #ff9900 !important; }
         .navbar-custom .btn-link.nav-link { color: #ffffff !important; }
         .navbar-custom .btn-link.nav-link:hover { color: #ff9900 !important; }
-        .cart-card { background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); overflow: hidden; }
         .cart-item-img { width: 100px; height: 100px; object-fit: cover; border-radius: 8px; }
         .cart-total { font-size: 1.4rem; font-weight: bold; color: #ff9900; }
-        .btn-remove { color: #dc3545; }
-        .btn-remove:hover { color: #c82333; }
+        .btn-warning { background-color: #ff9900; border-color: #ff9900; }
+        .btn-warning:hover { background-color: #e68a00; border-color: #e68a00; }
     </style>
+    <script>
+        // Apply dark mode preference from localStorage
+        document.addEventListener('DOMContentLoaded', function() {
+            const darkModeEnabled = localStorage.getItem('ks-tech-dark-mode') === 'true';
+            if (darkModeEnabled) {
+                document.documentElement.classList.add('dark-mode');
+            }
+        });
+    </script>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-custom navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="/"><i class="fas fa-microchip"></i> KS TECH</a>
             <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="/"><i class="fas fa-home"></i> Home</a>
-                <a class="nav-link" href="{{ route('cart.index') }}"><i class="fas fa-shopping-cart"></i> Cart</a>
-                <a class="nav-link" href="{{ route('favorites.index') }}"><i class="fas fa-heart"></i> Favorites</a>
-                <a class="nav-link" href="{{ route('profile.edit') }}"><i class="fas fa-user"></i> Profile</a>
+                <a class="nav-link" href="/"><i class="fas fa-home"></i> {{ __('messages.nav_home') }}</a>
+                <a class="nav-link" href="{{ route('cart.index') }}"><i class="fas fa-shopping-cart"></i> {{ __('messages.nav_cart') }}</a>
+                <a class="nav-link" href="{{ route('favorites.index') }}"><i class="fas fa-heart"></i> {{ __('messages.nav_favorites') }}</a>
+                <a class="nav-link" href="{{ route('profile.edit') }}"><i class="fas fa-user"></i> {{ __('messages.nav_profile') }}</a>
                 <form action="{{ route('logout') }}" method="POST" class="d-inline">
                     @csrf
-                    <button type="submit" class="btn btn-link nav-link" style="text-decoration:none;"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                    <button type="submit" class="btn btn-link nav-link" style="text-decoration:none;"><i class="fas fa-sign-out-alt"></i> {{ __('messages.nav_logout') }}</button>
                 </form>
             </div>
         </div>
     </nav>
 
     <div class="container my-5">
-        <h2 class="mb-4"><i class="fas fa-shopping-cart text-warning"></i> Your Cart</h2>
+        <h2 class="mb-4"><i class="fas fa-shopping-cart text-warning"></i> {{ __('messages.nav_cart') }}</h2>
 
         @if(session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
@@ -52,9 +91,9 @@
         @if($cartItems->isEmpty())
             <div class="cart-card p-5 text-center">
                 <i class="fas fa-shopping-cart fa-4x text-muted mb-3"></i>
-                <h4>Your cart is empty</h4>
-                <p class="text-muted">Add some tech products to get started!</p>
-                <a href="/" class="btn btn-warning mt-3"><i class="fas fa-shopping-bag"></i> Continue Shopping</a>
+                <h4>{{ __('messages.cart_empty') }}</h4>
+                <p class="text-muted">{{ __('messages.cart_empty_msg') }}</p>
+                <a href="/" class="btn btn-warning mt-3"><i class="fas fa-shopping-bag"></i> {{ __('messages.continue_shopping') }}</a>
             </div>
         @else
             <div class="row">
@@ -81,7 +120,7 @@
                                         <input type="number" name="quantity" value="{{ $item->quantity }}" min="1" max="{{ $item->product->quantity }}" class="form-control form-control-sm" style="width:70px;">
                                         <button type="submit" class="btn btn-sm btn-outline-secondary"><i class="fas fa-sync-alt"></i></button>
                                     </form>
-                                    <form action="{{ route('cart.remove', $item) }}" method="POST" class="d-inline" onsubmit="return confirm('Remove this item?');">
+                                    <form action="{{ route('cart.remove', $item) }}" method="POST" class="d-inline" onsubmit="return confirm('{{ __('messages.confirm_remove') }}');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-remove"><i class="fas fa-trash"></i></button>
@@ -96,12 +135,12 @@
                 </div>
                 <div class="col-lg-4">
                     <div class="cart-card p-4">
-                        <h5 class="mb-3">Order Summary</h5>
+                        <h5 class="mb-3">{{ __('messages.order_summary') }}</h5>
                         @php $subtotal = $cartItems->sum(fn($i) => $i->product->price * $i->quantity); @endphp
-                        <p class="d-flex justify-content-between mb-2"><span>Subtotal ({{ $cartItems->sum('quantity') }} items)</span><span class="cart-total">${{ number_format($subtotal, 2) }}</span></p>
+                        <p class="d-flex justify-content-between mb-2"><span>{{ __('messages.subtotal') }} ({{ $cartItems->sum('quantity') }} {{ __('messages.items') }})</span><span class="cart-total">${{ number_format($subtotal, 2) }}</span></p>
                         <hr>
-                        <a href="{{ route('checkout') }}" class="btn btn-warning w-100 mb-2"><i class="fas fa-lock"></i> Proceed to Checkout</a>
-                        <a href="/" class="btn btn-outline-secondary w-100"><i class="fas fa-arrow-left"></i> Continue Shopping</a>
+                        <a href="{{ route('checkout') }}" class="btn btn-warning w-100 mb-2"><i class="fas fa-lock"></i> {{ __('messages.checkout') }}</a>
+                        <a href="/" class="btn btn-outline-secondary w-100"><i class="fas fa-arrow-left"></i> {{ __('messages.continue_shopping') }}</a>
                     </div>
                 </div>
             </div>

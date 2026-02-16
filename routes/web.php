@@ -21,6 +21,7 @@ use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\StockNotificationController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\CouponController;
+use App\Http\Controllers\LocaleController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -45,6 +46,9 @@ Route::get('welcome', function () {
 });
 
 Route::get('ping', [teststoreController::class,'test']);
+
+// Language/Locale routes
+Route::get('/locale/{locale}', [LocaleController::class, 'setLocale'])->name('locale.set');
 
 // Public pages
 Route::get('/contact', [ContactController::class, 'show'])->name('contact');

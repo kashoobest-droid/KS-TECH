@@ -146,7 +146,36 @@ class OrderController extends Controller
     public function adminIndex()
     {
         $orders = Order::with('user', 'items')->latest()->paginate(15);
-        return view('admin.orders.index', compact('orders'));
+        
+        // Order statistics
+        $totalOrders = Order::count();
+        $totalRevenue = Order::whereIn('status', ['delivered', 'shipped'])->sum('total');
+        $pendingOrders = Order::where('status', 'pending')->count();
+        $completedOrders = Order::where('status', 'delivered')->count();
+        
+        // Orders by status
+        $ordersByStatus = Order::selectRaw('status, COUNT(*) as count')
+            ->groupBy('status')
+            ->get()
+            ->pluck('count', 'status')
+            ->toArray();
+        
+        // Revenue data (last 7 days)
+        $last7Days = Order::selectRaw('DATE(created_at) as date, SUM(total) as revenue')
+            ->where('created_at', '>=', now()->subDays(7))
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+        
+        return view('admin.orders.index', compact(
+            'orders',
+            'totalOrders',
+            'totalRevenue',
+            'pendingOrders',
+            'completedOrders',
+            'ordersByStatus',
+            'last7Days'
+        ));
     }
 
     public function updateStatus(Request $request, Order $order)

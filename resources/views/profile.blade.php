@@ -1,21 +1,67 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <title>Profile - KS Tech</title>
+    <title>{{ __('messages.nav_profile') }} - KS Tech</title>
     <style>
-        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto; }
-        .profile-card { max-width: 900px; margin: 40px auto; border-radius: 12px; overflow: hidden; }
+        /* Light Mode (Default) */
+        body { background: #f5f5f5; color: #333333; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto; }
+        .profile-card { max-width: 900px; margin: 40px auto; border-radius: 12px; overflow: hidden; border: 1px solid #ddd; }
         .profile-side { background: #1a1a1a; color: white; padding: 30px; display:flex; align-items:center; justify-content:center; }
         .profile-side i { color: #ff9900; font-size: 48px; }
+        .profile-side p { color: #b0b0b0; }
         .avatar-img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid #ff9900; }
-        .profile-body { padding: 24px; background: #fff; }
+        .profile-body { padding: 24px; background: #ffffff; color: #333333; }
+        .profile-body h4, .profile-body h5 { color: #333333; }
+        .btn-secondary { background-color: #e9ecef; border-color: #ddd; color: #333333; }
+        .btn-secondary:hover { background-color: #f5f5f5; border-color: #999; color: #333333; }
+        .form-label { color: #333333; }
+        .form-control { background-color: #ffffff; border-color: #ddd; color: #333333; }
+        .form-control:focus { background-color: #ffffff; border-color: #ff9900; color: #333333; box-shadow: 0 0 0 0.2rem rgba(255, 153, 0, 0.25); }
+        .form-select { background-color: #ffffff; border-color: #ddd; color: #333333; }
+        .form-select:focus { border-color: #ff9900; box-shadow: 0 0 0 0.2rem rgba(255, 153, 0, 0.25); }
+        .form-select option { background-color: #ffffff; color: #333333; }
+        .text-muted { color: #666666 !important; }
+        .alert { background-color: #ffffff; border-color: #ddd; color: #333333; }
+        .alert-success { background-color: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .invalid-feedback { display: block; color: #dc3545; }
+        hr { border-color: #ddd; }
+        
+        /* Dark Mode */
+        html.dark-mode body { background-color: #0f0f0f; color: #e0e0e0; }
+        html.dark-mode .profile-card { border-color: #2a2a2a; }
+        html.dark-mode .profile-body { background: #1a1a1a; color: #e0e0e0; }
+        html.dark-mode .profile-body h4, html.dark-mode .profile-body h5 { color: #ffffff; }
+        html.dark-mode .btn-secondary { background-color: #2a2a2a; border-color: #3a3a3a; color: #e0e0e0; }
+        html.dark-mode .btn-secondary:hover { background-color: #3a3a3a; border-color: #4a4a4a; color: #ffffff; }
+        html.dark-mode .form-label { color: #ffffff; }
+        html.dark-mode .form-control { background-color: #2a2a2a; border-color: #3a3a3a; color: #e0e0e0; }
+        html.dark-mode .form-control:focus { background-color: #2a2a2a; border-color: #ff9900; color: #e0e0e0; }
+        html.dark-mode .form-select { background-color: #2a2a2a; border-color: #3a3a3a; color: #e0e0e0; }
+        html.dark-mode .form-select:focus { border-color: #ff9900; }
+        html.dark-mode .form-select option { background-color: #1a1a1a; color: #e0e0e0; }
+        html.dark-mode .text-muted { color: #b0b0b0 !important; }
+        html.dark-mode .alert { background-color: #1a1a1a; border-color: #2a2a2a; color: #e0e0e0; }
+        html.dark-mode .alert-success { background-color: #1a2a1a; border-color: #2a5a2a; color: #90ee90; }
+        html.dark-mode .invalid-feedback { color: #ff9999; }
+        html.dark-mode hr { border-color: #2a2a2a; }
+        
         .btn-save { background: linear-gradient(135deg,#ff9900 0%,#e68a00 100%); border:none; color:white; }
+        .btn-save:hover { background: linear-gradient(135deg,#e68a00 0%,#d97a00 100%); color:white; }
     </style>
+    <script>
+        // Apply dark mode preference from localStorage
+        document.addEventListener('DOMContentLoaded', function() {
+            const darkModeEnabled = localStorage.getItem('ks-tech-dark-mode') === 'true';
+            if (darkModeEnabled) {
+                document.documentElement.classList.add('dark-mode');
+            }
+        });
+    </script>
 </head>
 <body>
     <div class="card profile-card">
@@ -28,7 +74,7 @@
                         <i class="fas fa-user-circle" style="font-size: 80px;"></i>
                     @endif
                     <h4 style="margin-top:12px;">{{ $user->name }}</h4>
-                    <p style="opacity:.85;">Manage your account</p>
+                    <p style="opacity:.85;">{{ __('messages.profile_manage_account') }}</p>
                 </div>
             </div>
             <div class="col-md-8 profile-body">
@@ -38,34 +84,34 @@
                 <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="mb-3">
-                        <label class="form-label">Profile Avatar</label>
+                        <label class="form-label">{{ __('messages.profile_avatar') }}</label>
                         <input type="file" name="avatar" class="form-control @error('avatar') is-invalid @enderror" accept="image/jpeg,image/png,image/jpg,image/gif,image/svg+xml">
-                        <small class="text-muted">Max 2MB. Formats: JPEG, PNG, JPG, GIF, SVG.</small>
+                        <small class="text-muted">{{ __('messages.profile_avatar_help') }}</small>
                         @error('avatar')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Full Name</label>
+                        <label class="form-label">{{ __('messages.profile_full_name') }}</label>
                         <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name', $user->name) }}" required>
                         @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Email Address</label>
+                        <label class="form-label">{{ __('messages.profile_email') }}</label>
                         <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email', $user->email) }}" required>
                         @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Phone Number</label>
+                        <label class="form-label">{{ __('messages.profile_phone') }}</label>
                         <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" value="{{ old('phone', $user->phone) }}">
                         @error('phone')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
 
                     <hr>
-                    <h5 class="mb-3">Address Information</h5>
+                    <h5 class="mb-3">{{ __('messages.profile_address') }}</h5>
 
                     <div class="mb-3">
-                        <label class="form-label">Country</label>
+                        <label class="form-label">{{ __('messages.profile_country') }}</label>
                         <select name="country" class="form-select @error('country') is-invalid @enderror">
-                            <option value="">-- Select a Country --</option>
+                            <option value="">{{ __('messages.profile_select_country') }}</option>
                             <option value="Afghanistan" {{ old('country', $user->country) === 'Afghanistan' ? 'selected' : '' }}>Afghanistan</option>
                             <option value="Albania" {{ old('country', $user->country) === 'Albania' ? 'selected' : '' }}>Albania</option>
                             <option value="Algeria" {{ old('country', $user->country) === 'Algeria' ? 'selected' : '' }}>Algeria</option>
@@ -264,63 +310,63 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Street Name</label>
+                        <label class="form-label">{{ __('messages.profile_street') }}</label>
                         <input type="text" name="street_name" class="form-control @error('street_name') is-invalid @enderror" value="{{ old('street_name', $user->street_name) }}">
                         @error('street_name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Building Name / Number</label>
+                        <label class="form-label">{{ __('messages.profile_building') }}</label>
                         <input type="text" name="building_name" class="form-control @error('building_name') is-invalid @enderror" value="{{ old('building_name', $user->building_name) }}">
                         @error('building_name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Floor / Apartment Number <span style="font-size:0.85rem; color:#999;">(Optional)</span></label>
+                        <label class="form-label">{{ __('messages.profile_floor') }} <span style="font-size:0.85rem; color:#999;">({{ __('messages.profile_optional') }})</span></label>
                         <input type="text" name="floor_apartment" class="form-control @error('floor_apartment') is-invalid @enderror" value="{{ old('floor_apartment', $user->floor_apartment) }}">
                         @error('floor_apartment')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Landmark <span style="font-size:0.85rem; color:#999;">(Optional)</span></label>
-                        <input type="text" name="landmark" class="form-control @error('landmark') is-invalid @enderror" value="{{ old('landmark', $user->landmark) }}" placeholder="e.g., Near City Central, Opposite Hospital">
+                        <label class="form-label">{{ __('messages.profile_landmark') }} <span style="font-size:0.85rem; color:#999;">({{ __('messages.profile_optional') }})</span></label>
+                        <input type="text" name="landmark" class="form-control @error('landmark') is-invalid @enderror" value="{{ old('landmark', $user->landmark) }}" placeholder="{{ __('messages.profile_landmark_help') }}">
                         @error('landmark')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">City / Area</label>
+                        <label class="form-label">{{ __('messages.profile_city') }}</label>
                         <input type="text" name="city_area" class="form-control @error('city_area') is-invalid @enderror" value="{{ old('city_area', $user->city_area) }}">
                         @error('city_area')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
 
                     <div class="d-flex gap-2">
-                        <button class="btn btn-save">Save Changes</button>
-                        <a href="/" class="btn btn-secondary">Cancel</a>
+                        <button class="btn btn-save">{{ __('messages.profile_save') }}</button>
+                        <a href="/" class="btn btn-secondary">{{ __('messages.profile_cancel') }}</a>
                     </div>
                 </form>
 
                 <hr class="my-4">
 
-                <h5 class="mb-3">Change Password</h5>
+                <h5 class="mb-3">{{ __('messages.profile_change_password') }}</h5>
                 <form action="{{ route('profile.password.update') }}" method="POST" class="mt-3">
                     @csrf
                     @method('PUT')
                     <div class="mb-3">
-                        <label class="form-label">Current Password</label>
+                        <label class="form-label">{{ __('messages.profile_current_password') }}</label>
                         <input type="password" name="current_password" class="form-control @error('current_password') is-invalid @enderror" required autocomplete="current-password">
                         @error('current_password')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">New Password</label>
+                        <label class="form-label">{{ __('messages.profile_new_password') }}</label>
                         <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" required autocomplete="new-password">
-                        <small class="text-muted">Min 8 characters, with letters (upper & lower) and numbers</small>
+                        <small class="text-muted">{{ __('messages.profile_password_help') }}</small>
                         @error('password')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Confirm New Password</label>
+                        <label class="form-label">{{ __('messages.profile_confirm_password') }}</label>
                         <input type="password" name="password_confirmation" class="form-control" required autocomplete="new-password">
                     </div>
-                    <button type="submit" class="btn btn-save">Update Password</button>
+                    <button type="submit" class="btn btn-save">{{ __('messages.profile_update_password') }}</button>
                 </form>
             </div>
         </div>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,10 +8,126 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <title>{{ $product->name }} - KS Tech Store</title>
     <style>
-        body { background-color: #f5f5f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto; }
-        .navbar-custom { background-color: #1a1a1a; }
+        /* Light Mode (Default) */
+        body { background-color: #f5f5f5; color: #333333; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto; }
+        .navbar-custom { background-color: #1a1a1a; padding: 20px 0 !important; }
+        .navbar-custom .navbar-nav { display: flex !important; flex-direction: row !important; gap: 20px; align-items: center; }
+        .navbar-custom .nav-link { padding: 0 !important; margin: 0 !important; display: inline-flex; align-items: center; gap: 5px; }
         .navbar-custom .navbar-brand, .navbar-custom .nav-link { color: #ff9900 !important; }
         .product-detail-img { max-height: 400px; object-fit: contain; }
+        .bg-white { background: white; color: #333333; }
+        h2, h3, h4, h5, h6 { color: #333333; }
+        h4 { color: #000000 !important; }
+        strong { color: #000000 !important; }
+        .stock-quantity { color: #000000 !important; font-weight: 600; }
+        .text-muted { color: #666666 !important; }
+        .text-dark, .text-dark a { color: #333333 !important; }
+        .card { background: white; color: #333333; border-color: #ddd; }
+        .badge { background-color: #6c757d !important; }
+        .btn-warning { background-color: #ff9900; border-color: #ff9900; }
+        .btn-warning:hover { background-color: #e68a00; border-color: #e68a00; }
+        .btn-outline-danger { color: #dc3545; border-color: #ddd; }
+        .btn-outline-danger:hover { background-color: #f8d7da; border-color: #dc3545; }
+        .btn-secondary { background-color: #f5f5f5; border-color: #ddd; color: #333333; }
+        .btn-secondary:hover { background-color: #e9ecef; border-color: #999; }
+        .btn-success { background-color: #28a745; border-color: #28a745; }
+        .form-control, .form-select { background-color: #ffffff; border-color: #ddd; color: #333333; }
+        .form-control:focus, .form-select:focus { border-color: #ff9900; box-shadow: 0 0 0 0.2rem rgba(255, 153, 0, 0.25); }
+        .alert { background-color: #f8f9fa; border-color: #ddd; color: #333333; }
+        .alert-info { background-color: #d1ecf1; border-color: #bee5eb; color: #0c5460; }
+        .alert-success { background-color: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .bg-light { background-color: #f8f9fa !important; }
+        .border { border-color: #ddd !important; }
+        .carousel-slide { background: white; }
+        .review-card { background: white; border-color: #eee; }
+        .reaction-btn { border-color: #ddd; background: white; color: #666; }
+        .reaction-btn:hover { border-color: #ff9900; color: #ff9900; }
+        .reaction-btn.active { background: #ff9900; color: white; border-color: #ff9900; }
+        .shadow-sm { box-shadow: 0 .125rem .25rem rgba(0,0,0,.075); }
+        .text-danger { color: #dc3545 !important; }
+        .text-success { color: #28a745 !important; }
+        .text-warning { color: #ff9900 !important; }
+        .breadcrumb { background-color: transparent; }
+        .breadcrumb-item { color: #333333; }
+        .breadcrumb-item.active { color: #000000; }
+        .breadcrumb-item a { color: #ff9900; text-decoration: none; }
+        .breadcrumb-item a:hover { color: #e68a00; }
+        h2 { color: #000000 !important; }
+        .text-muted { color: #000000 !important; }
+        .offer-card-modern { background: linear-gradient(135deg, #fff8f0 0%, #fff0e6 50%, #ffe8d9 100%); border-color: rgba(255, 153, 0, 0.25); }
+        .offer-card-modern__label { color: #c2410c; }
+        .offer-card-modern__title { color: #1a1a1a; }
+        .offer-card-modern__desc { color: #666; }
+        .offer-card-modern__countdown { color: #555; }
+        .offer-card-modern__countdown-value { color: #c2410c; }
+        .offer-card-modern__countdown-label { color: #666; }
+        .offer-card-modern__meta { color: #666; }
+        
+        /* Dark Mode */
+        html.dark-mode body { background-color: #0f0f0f; color: #e0e0e0; }
+        html.dark-mode .bg-white { background: #1a1a1a; color: #e0e0e0; }
+        html.dark-mode h2, html.dark-mode h3, html.dark-mode h4, html.dark-mode h5, html.dark-mode h6 { color: #ffffff; }
+        html.dark-mode .text-muted { color: #b0b0b0 !important; }
+        html.dark-mode .text-dark, html.dark-mode .text-dark a { color: #ffffff !important; }
+        html.dark-mode .card { background: #1a1a1a; color: #e0e0e0; border-color: #2a2a2a; }
+        html.dark-mode .badge { background-color: #2a2a2a !important; color: #b0b0b0 !important; }
+        html.dark-mode .btn-secondary { background-color: #2a2a2a; border-color: #3a3a3a; color: #e0e0e0; }
+        html.dark-mode .btn-secondary:hover { background-color: #3a3a3a; border-color: #4a4a4a; color: #ffffff; }
+        html.dark-mode .btn-success { background-color: #1a4d2e; border-color: #28a745; }
+        html.dark-mode .form-control, html.dark-mode .form-select { background-color: #2a2a2a; border-color: #3a3a3a; color: #e0e0e0; }
+        html.dark-mode .form-control:focus, html.dark-mode .form-select:focus { border-color: #ff9900; box-shadow: 0 0 0 0.2rem rgba(255, 153, 0, 0.25); }
+        html.dark-mode .alert { background-color: #1a1a1a; border-color: #2a2a2a; color: #e0e0e0; }
+        html.dark-mode .alert-info { background-color: #1a2a3a; border-color: #2a4a5a; color: #90ccff; }
+        html.dark-mode .alert-success { background-color: #1a2a1a; border-color: #2a5a2a; color: #90ee90; }
+        html.dark-mode .bg-light { background-color: #2a2a2a !important; }
+        html.dark-mode .border { border-color: #2a2a2a !important; }
+        html.dark-mode .carousel-slide { background: #1a1a1a; }
+        html.dark-mode .review-card { background: #1a1a1a; border-color: #2a2a2a; }
+        html.dark-mode .reaction-btn { border-color: #3a3a3a; background: #1a1a1a; color: #b0b0b0; }
+        html.dark-mode .reaction-btn:hover { border-color: #ff9900; color: #ff9900; }
+        html.dark-mode .reaction-btn.active { background: #ff9900; color: white; border-color: #ff9900; }
+        html.dark-mode .text-danger { color: #ff6b6b !important; }
+        html.dark-mode .text-success { color: #90ee90 !important; }
+        html.dark-mode .text-warning { color: #ff9900 !important; }
+        html.dark-mode .btn-outline-danger { color: #ff6b6b; border-color: #3a3a3a; }
+        html.dark-mode .btn-outline-danger:hover { background-color: #5a1a1a; border-color: #ff6b6b; }
+        html.dark-mode .btn-secondary:disabled { background-color: #3a3a3a; border-color: #2a2a2a; color: #b0b0b0; }
+        html.dark-mode p { color: #e0e0e0; }
+        html.dark-mode label { color: #e0e0e0; }
+        html.dark-mode .form-label { color: #e0e0e0; }
+        html.dark-mode .small { color: #b0b0b0; }
+        html.dark-mode a { color: #ff9900; }
+        html.dark-mode a:hover { color: #ffaa00; }
+        html.dark-mode .card-body { color: #e0e0e0; }
+        html.dark-mode .card-title { color: #ffffff; }
+        html.dark-mode .review-header { color: #e0e0e0; }
+        html.dark-mode strong { color: #000000 !important; }
+        html.dark-mode .review-card strong { color: #ffffff !important; }
+        html.dark-mode .review-card .text-muted.small { color: #ffffff !important; }
+        html.dark-mode .review-card .text-muted { color: #ffffff !important; }
+        html.dark-mode .bg-light .text-muted.small { color: #ffffff !important; }
+        html.dark-mode .modal-content { background: #1a1a1a; color: #e0e0e0; border-color: #2a2a2a; }
+        html.dark-mode .modal-header { border-color: #2a2a2a; }
+        html.dark-mode .modal-footer { border-color: #2a2a2a; }
+        html.dark-mode .modal-title { color: #ffffff; }
+        html.dark-mode .btn-close { filter: invert(1); }
+        html.dark-mode .breadcrumb { background-color: transparent; }
+        html.dark-mode .breadcrumb-item { color: #e0e0e0; }
+        html.dark-mode .breadcrumb-item.active { color: #000000; }
+        html.dark-mode .breadcrumb-item a { color: #ff9900; text-decoration: none; }
+        html.dark-mode .breadcrumb-item a:hover { color: #ffaa00; }
+        html.dark-mode h2 { color: #000000 !important; }
+        html.dark-mode .text-muted { color: #000000 !important; }
+        html.dark-mode .share-buttons { border-top-color: #2a2a2a; }
+        html.dark-mode .share-buttons .small { color: #e0e0e0; }
+        html.dark-mode .offer-card-modern { background: linear-gradient(135deg, #1f1f1f 0%, #262626 50%, #2d2d2d 100%); border-color: rgba(255, 153, 0, 0.35); }
+        html.dark-mode .offer-card-modern__label { color: #ffaa00; }
+        html.dark-mode .offer-card-modern__title { color: #ffffff; }
+        html.dark-mode .offer-card-modern__desc { color: #b0b0b0; }
+        html.dark-mode .offer-card-modern__countdown { color: #e0e0e0; }
+        html.dark-mode .offer-card-modern__countdown-value { color: #ffaa00; }
+        html.dark-mode .offer-card-modern__countdown-label { color: #b0b0b0; }
+        html.dark-mode .offer-card-modern__meta { color: #b0b0b0; }
         .offer-card-modern { margin-top: 12px; border-radius: 12px; overflow: hidden; background: linear-gradient(135deg, #fff8f0 0%, #fff0e6 50%, #ffe8d9 100%); border: 1px solid rgba(255, 153, 0, 0.25); box-shadow: 0 2px 12px rgba(255, 153, 0, 0.08); }
         .offer-card-modern__inner { display: flex; gap: 14px; align-items: center; padding: 14px 16px; }
         .offer-card-modern__media { position: relative; flex-shrink: 0; width: 88px; min-width: 88px; height: 88px; border-radius: 10px; overflow: hidden; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
@@ -46,12 +162,12 @@
             font-size: 1.1rem;
             text-decoration: none !important;
         }
-        .share-btn-twitter { background: #1DA1F2; color: white; }
-        .share-btn-twitter:hover { background: #1a8cd8; transform: translateY(-2px); }
-        .share-btn-facebook { background: #1877F2; color: white; }
-        .share-btn-facebook:hover { background: #0a66c2; transform: translateY(-2px); }
-        .share-btn-whatsapp { background: #25D366; color: white; }
-        .share-btn-whatsapp:hover { background: #1fa856; transform: translateY(-2px); }
+        .share-btn-twitter { background: #000000; color: white; }
+        .share-btn-twitter:hover { background: #333333; transform: translateY(-2px); }
+        .share-btn-facebook { background: #000000; color: white; }
+        .share-btn-facebook:hover { background: #333333; transform: translateY(-2px); }
+        .share-btn-whatsapp { background: #000000; color: white; }
+        .share-btn-whatsapp:hover { background: #333333; transform: translateY(-2px); }
         
         /* Review card styling */
         .review-card {
@@ -71,6 +187,7 @@
             align-items: start;
             margin-bottom: 10px;
         }
+        i.fas.fa-comments { color: #000000; }
         .review-actions {
             display: flex;
             gap: 5px;
@@ -113,15 +230,24 @@
             gap: 8px;
         }
     </style>
+    <script>
+        // Apply dark mode preference from localStorage
+        document.addEventListener('DOMContentLoaded', function() {
+            const darkModeEnabled = localStorage.getItem('ks-tech-dark-mode') === 'true';
+            if (darkModeEnabled) {
+                document.documentElement.classList.add('dark-mode');
+            }
+        });
+    </script>
 </head>
 <body>
     <nav class="navbar navbar-custom navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="/"><i class="fas fa-microchip"></i> KS TECH</a>
             <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="/">Home</a>
-                <a class="nav-link" href="{{ auth()->check() ? route('cart.index') : route('login') }}">Cart</a>
-                <a class="nav-link" href="{{ auth()->check() ? route('favorites.index') : route('login') }}">Favorites</a>
+                <a class="nav-link" href="/"><i class="fas fa-home"></i> {{ __('messages.nav_home') }}</a>
+                <a class="nav-link" href="{{ auth()->check() ? route('cart.index') : route('login') }}"><i class="fas fa-shopping-cart"></i> {{ __('messages.nav_cart') }}</a>
+                <a class="nav-link" href="{{ auth()->check() ? route('favorites.index') : route('login') }}"><i class="far fa-heart"></i> {{ __('messages.nav_favorites') }}</a>
             </div>
         </div>
     </nav>
@@ -134,7 +260,7 @@
                 ['label' => $product->name, 'url' => ''],
             ]
         ])
-        <a href="{{ url()->previous() }}" class="text-muted text-decoration-none mb-3 d-inline-block"><i class="fas fa-arrow-left"></i> Back</a>
+        <a href="{{ url()->previous() }}" class="text-muted text-decoration-none mb-3 d-inline-block"><i class="fas fa-arrow-left"></i> {{ __('messages.product_back') }}</a>
         <div class="row">
             <div class="col-md-6">
                 @if($product->images->count())
@@ -164,12 +290,12 @@
                     <span class="badge bg-secondary">{{ optional($product->category)->name ?? 'Uncategorized' }}</span>
                     <h2 class="mt-2">{{ $product->name }}</h2>
                     <p class="text-muted">{{ $product->description }}</p>
-                    <p class="mb-2"><strong>Stock:</strong>
+                    <p class="mb-2"><strong>{{ __('messages.product_stock') }}:</strong>
                         @if($product->quantity < 1)
-                            <span class="text-danger">Out of stock</span>
+                            <span class="text-danger">{{ __('messages.out_of_stock') }}</span>
                         @else
-                            {{ $product->quantity }}
-                            @if($product->quantity < 5)<span class="text-danger small">(Only {{ $product->quantity }} left!)</span>@endif
+                            <span class="stock-quantity">{{ $product->quantity }}</span>
+                            @if($product->quantity < 5)<span class="text-danger small">({{ __('messages.product_only_left', ['count' => $product->quantity]) }})</span>@endif
                         @endif
                     </p>
                     <h3 class="text-warning mb-4">${{ number_format($product->price, 2) }}</h3>
@@ -179,29 +305,29 @@
                     @auth
                         <div class="d-flex gap-2 mt-3">
                             @if($product->quantity < 1)
-                                <button type="button" class="btn btn-secondary btn-lg flex-grow-1" disabled><i class="fas fa-times-circle"></i> Out of Stock</button>
+                                <button type="button" class="btn btn-secondary btn-lg flex-grow-1" disabled><i class="fas fa-times-circle"></i> {{ __('messages.out_of_stock') }}</button>
                             @else
                             <form action="{{ route('cart.add', $product) }}" method="POST" class="flex-grow-1">
                                 @csrf
-                                <button type="submit" class="btn btn-warning btn-lg w-100"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+                                <button type="submit" class="btn btn-warning btn-lg w-100"><i class="fas fa-shopping-cart"></i> {{ __('messages.add_to_cart') }}</button>
                             </form>
                             @endif
                             <form action="{{ route('favorites.toggle', $product) }}" method="POST">
                                 @csrf
-                                <button type="submit" class="btn btn-outline-danger btn-lg"><i class="far fa-heart"></i> <span class="d-none d-sm-inline ms-2">Favorites</span></button>
+                                <button type="submit" class="btn btn-outline-danger btn-lg"><i class="far fa-heart"></i> <span class="d-none d-sm-inline ms-2">{{ __('messages.add_to_favorites') }}</span></button>
                             </form>
                         </div>
                     @else
-                        <a href="{{ route('login') }}" class="btn btn-warning btn-lg mt-3 w-100"><i class="fas fa-sign-in-alt"></i> Sign in to Add to Cart</a>
+                        <a href="{{ route('login') }}" class="btn btn-warning btn-lg mt-3 w-100"><i class="fas fa-sign-in-alt"></i> {{ __('messages.sign_in_to_add') }}</a>
                     @endauth
                     @if($product->quantity < 1)
                         <div id="notify-me" class="mt-3 p-3 rounded border border-success bg-success bg-opacity-10">
-                            <p class="mb-2 fw-bold text-success"><i class="fas fa-bell"></i> Want this when it's back?</p>
-                            <p class="small text-muted mb-2">Enter your email and we'll notify you as soon as it's in stock.</p>
+                            <p class="mb-2 fw-bold text-success"><i class="fas fa-bell"></i> {{ __('messages.product_notify_title') }}</p>
+                            <p class="small text-muted mb-2">{{ __('messages.product_notify_desc') }}</p>
                             <form action="{{ route('stock-notify.store', $product) }}" method="POST" class="d-flex gap-2 flex-wrap">
                                 @csrf
-                                <input type="email" name="email" class="form-control" style="max-width: 220px;" placeholder="Your email" required>
-                                <button type="submit" class="btn btn-success"><i class="fas fa-bell"></i> Notify me</button>
+                                <input type="email" name="email" class="form-control" style="max-width: 220px;" placeholder="{{ __('messages.profile_email') }}" required>
+                                <button type="submit" class="btn btn-success"><i class="fas fa-bell"></i> {{ __('messages.product_notify_btn') }}</button>
                             </form>
                             @if(session('success'))<p class="small text-success mb-0 mt-2">{{ session('success') }}</p>@endif
                             @if(session('info'))<p class="small text-info mb-0 mt-2">{{ session('info') }}</p>@endif
@@ -210,20 +336,20 @@
                     
                     <!-- Rate this product (only for verified buyers) -->
                     <div id="rate-product" class="mt-4 p-3 rounded border bg-light">
-                        <h5 class="mb-2"><i class="fas fa-star text-warning"></i> Rate this product</h5>
+                        <h5 class="mb-2"><i class="fas fa-star text-warning"></i> {{ __('messages.product_rate_title') }}</h5>
                         @php $avg = $product->averageRating(); @endphp
                         @if($product->reviews->count() > 0)
-                            <p class="mb-3 small"><span class="text-warning">@for($i=1;$i<=5;$i++)<i class="{{ $i <= round($avg) ? 'fas' : 'far' }} fa-star"></i>@endfor</span> {{ number_format($avg, 1) }} ({{ $product->reviews->count() }} review{{ $product->reviews->count() !== 1 ? 's' : '' }})</p>
+                            <p class="mb-3 small"><span class="text-warning">@for($i=1;$i<=5;$i++)<i class="{{ $i <= round($avg) ? 'fas' : 'far' }} fa-star"></i>@endfor</span> {{ number_format($avg, 1) }} ({{ $product->reviews->count() }} {{ __('messages.product_review' . ($product->reviews->count() !== 1 ? 's' : '')) }})</p>
                         @endif
                         @auth
                             @if($product->hasPurchasedBy(auth()->user()))
                                 <form action="{{ route('review.store', $product) }}" method="POST">
                                     @csrf
                                     <div class="mb-2">
-                                        <label class="form-label small">Your rating (click stars)</label>
+                                        <label class="form-label small">{{ __('messages.product_rating') }}</label>
                                         <div class="d-flex gap-1 align-items-center" id="rating-stars">
                                             @for($i=1;$i<=5;$i++)
-                                                <label class="mb-0" style="cursor:pointer;" title="{{ $i }} star{{ $i !== 1 ? 's' : '' }}">
+                                                <label class="mb-0" style="cursor:pointer;" title="{{ $i }} {{ __('messages.product_star' . ($i !== 1 ? 's' : '')) }}">
                                                     <input type="radio" name="rating" value="{{ $i }}" class="d-none" {{ old('rating') == $i ? 'checked' : '' }} required>
                                                     <i class="far fa-star text-warning fs-5 rating-star" data-value="{{ $i }}"></i>
                                                 </label>
@@ -231,25 +357,25 @@
                                         </div>
                                     </div>
                                     <div class="mb-2">
-                                        <label class="form-label small">Your review (optional)</label>
-                                        <textarea name="comment" class="form-control form-control-sm" rows="2" placeholder="Write a short review...">{{ old('comment') }}</textarea>
+                                        <label class="form-label small">{{ __('messages.product_review_label') }}</label>
+                                        <textarea name="comment" class="form-control form-control-sm" rows="2" placeholder="{{ __('messages.product_review_placeholder') }}">{{ old('comment') }}</textarea>
                                     </div>
-                                    <button type="submit" class="btn btn-warning btn-sm"><i class="fas fa-paper-plane"></i> Submit review</button>
+                                    <button type="submit" class="btn btn-warning btn-sm"><i class="fas fa-paper-plane"></i> {{ __('messages.product_submit_review') }}</button>
                                 </form>
                                 @if(session('review_success'))<p class="small text-success mt-2 mb-0"><i class="fas fa-check-circle"></i> {{ session('review_success') }}</p>@endif
                             @else
                                 <div class="alert alert-info mb-0">
-                                    <i class="fas fa-info-circle"></i> <strong>Only verified buyers can leave reviews.</strong> 
-                                    <br><small class="mt-1 d-block">Purchase this product first to share your honest feedback and help other customers make informed decisions.</small>
+                                    <i class="fas fa-info-circle"></i> <strong>{{ __('messages.product_verified_only') }}</strong> 
+                                    <br><small class="mt-1 d-block">{{ __('messages.product_purchase_msg') }}</small>
                                 </div>
                             @endif
                         @else
-                            <p class="small mb-0"><a href="{{ route('login') }}">Sign in</a> to rate and review this product. (Only verified buyers can review)</p>
+                            <p class="small mb-0"><a href="{{ route('login') }}">{{ __('messages.nav_sign_in') }}</a> {{ __('messages.product_sign_in_review') }}</p>
                         @endauth
                     </div>
 
                     <div class="share-buttons">
-                        <span class="small text-muted fw-bold">Share:</span>
+                        <span class="small text-muted fw-bold">{{ __('messages.product_share') }}:</span>
                         @php $productUrl = route('product.show', $product); $productName = $product->name; @endphp
                         <a href="https://twitter.com/intent/tweet?url={{ urlencode($productUrl) }}&text={{ urlencode($productName) }}" target="_blank" rel="noopener" class="share-btn share-btn-twitter" title="Share on X/Twitter"><i class="fab fa-twitter"></i></a>
                         <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode($productUrl) }}" target="_blank" rel="noopener" class="share-btn share-btn-facebook" title="Share on Facebook"><i class="fab fa-facebook-f"></i></a>
@@ -261,7 +387,7 @@
 
         @if(isset($relatedProducts) && $relatedProducts->isNotEmpty())
         <div class="mt-5">
-            <h4 class="mb-3">You might also like</h4>
+            <h4 class="mb-3">{{ __('messages.product_also_like') }}</h4>
             <div class="row g-3">
                 @foreach($relatedProducts as $rel)
                 <div class="col-6 col-md-3">
@@ -285,7 +411,7 @@
         @endif
 
         <div class="mt-5 bg-white rounded shadow-sm p-4">
-            <h4 class="mb-4"><i class="fas fa-comments"></i> Customer reviews</h4>
+            <h4 class="mb-4"><i class="fas fa-comments"></i> {{ __('messages.product_customer_reviews') }}</h4>
             @php $avg = $product->averageRating(); @endphp
             @if($product->reviews->count() > 0)
                 <div class="mb-4 p-3 bg-light rounded">
@@ -313,7 +439,7 @@
                             @if(auth()->check() && auth()->user()->id === $review->user_id)
                                 <div class="review-actions">
                                     <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editReviewModal{{ $review->id }}" title="Edit review"><i class="fas fa-edit"></i></button>
-                                    <form action="{{ route('review.destroy', $review) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this review?');">
+                                    <form action="{{ route('review.destroy', $review) }}" method="POST" style="display: inline;" onsubmit="return confirm('{{ __('messages.product_delete_confirm') }}');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete review"><i class="fas fa-trash"></i></button>
@@ -344,7 +470,7 @@
                             </div>
                         @else
                             <div class="review-reactions">
-                                <span class="small text-muted"><a href="{{ route('login') }}">Sign in</a> to rate this review</span>
+                                <span class="small text-muted"><a href="{{ route('login') }}">{{ __('messages.nav_sign_in') }}</a> {{ __('messages.product_rate_review') }}</span>
                             </div>
                         @endauth
                     </div>
@@ -355,7 +481,7 @@
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title">Edit Review</h5>
+                                        <h5 class="modal-title">{{ __('messages.product_edit_review') }}</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                     </div>
                                     <form action="{{ route('review.update', $review) }}" method="POST">
@@ -363,7 +489,7 @@
                                         @method('PUT')
                                         <div class="modal-body">
                                             <div class="mb-3">
-                                                <label class="form-label">Rating</label>
+                                                <label class="form-label">{{ __('messages.product_rating') }}</label>
                                                 <div class="d-flex gap-1" id="editRatingStars{{ $review->id }}">
                                                     @for($i=1;$i<=5;$i++)
                                                         <label style="cursor:pointer; font-size: 1.5rem;">
@@ -374,13 +500,13 @@
                                                 </div>
                                             </div>
                                             <div class="mb-3">
-                                                <label class="form-label">Review (optional)</label>
+                                                <label class="form-label">{{ __('messages.product_review_label') }}</label>
                                                 <textarea name="comment" class="form-control" rows="3">{{ $review->comment }}</textarea>
                                             </div>
                                         </div>
                                         <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                            <button type="submit" class="btn btn-warning"><i class="fas fa-save"></i> Save Changes</button>
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.profile_cancel') }}</button>
+                                            <button type="submit" class="btn btn-warning"><i class="fas fa-save"></i> {{ __('messages.profile_save') }}</button>
                                         </div>
                                     </form>
                                 </div>
@@ -390,7 +516,7 @@
                 @endforeach
             @else
                 <div class="alert alert-info mb-0">
-                    <i class="fas fa-info-circle"></i> No customer reviews yet. Be the first to share your feedback!
+                    <i class="fas fa-info-circle"></i> {{ __('messages.product_no_reviews') }}
                 </div>
             @endif
         </div>

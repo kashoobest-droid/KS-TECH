@@ -14,21 +14,21 @@
                 width="72"
                 height="72"
             />
-            <span class="offer-card-modern__badge">Free gift</span>
+            <span class="offer-card-modern__badge">{{ __('messages.offer_free_gift') }}</span>
         </div>
         <div class="offer-card-modern__body">
-            <span class="offer-card-modern__label">{{ $offer->offer_name ?? 'Special Offer' }}</span>
+            <span class="offer-card-modern__label">{{ $offer->offer_name ?? __('messages.offer_special') }}</span>
             <h6 class="offer-card-modern__title">{{ \Illuminate\Support\Str::limit($offer->gift_name, 50) }}</h6>
             @if($offer->description)
                 <p class="offer-card-modern__desc">{{ \Illuminate\Support\Str::limit($offer->description, 100) }}</p>
             @endif
             @if($offerEnds)
                 <div class="offer-card-modern__countdown">
-                    <span class="offer-card-modern__countdown-label">Ends in</span>
+                    <span class="offer-card-modern__countdown-label">{{ __('messages.offer_ends_in') }}</span>
                     <span id="{{ $uniqueId }}" class="offer-card-modern__countdown-value" data-ends-at="{{ $offerEnds }}">--:--:--</span>
                 </div>
             @elseif($offerStarts)
-                <div class="offer-card-modern__meta">Started {{ $offerStarts }}</div>
+                <div class="offer-card-modern__meta">{{ __('messages.offer_started') }} {{ $offerStarts }}</div>
             @endif
         </div>
     </div>
